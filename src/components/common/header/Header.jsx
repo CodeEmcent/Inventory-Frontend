@@ -1,19 +1,11 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../../contexts/AuthContext"; // Import the useAuth hook
 import "./header.css";
 import { nav } from "../../data/Data";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [navList, setNavList] = useState(false);
-  const [hoveredNav, setHoveredNav] = useState(null);
-  const { isLoggedIn, logout } = useAuth(); // Use context to get login status and logout function
-  const navigate = useNavigate(); // For navigation after logging out
-
-  const handleSignOut = () => {
-    logout(); // Call the logout function from the context
-    navigate("/"); // Redirect to the homepage or wherever after sign out
-  };
+  const [hoveredNav, setHoveredNav] = useState(null); // Track which nav item is being hovered
 
   return (
     <>
@@ -28,15 +20,17 @@ const Header = () => {
                 <li
                   key={index}
                   className={list.dropdown ? "dropdown" : ""}
-                  onMouseEnter={() => setHoveredNav(index)}
-                  onMouseLeave={() => setHoveredNav(null)}
+                  onMouseEnter={() => setHoveredNav(index)} // Set hovered nav
+                  onMouseLeave={() => setHoveredNav(null)} // Reset hovered nav
                 >
                   <Link to={list.path}>{list.text}</Link>
+                  {/* Conditionally render the description text for 'services' */}
                   {hoveredNav === index && list.description && (
                     <div className="secondary-nav-text">
                       <p>{list.description}</p>
                     </div>
                   )}
+                  {/* If the nav item has dropdown items */}
                   {list.dropdown && (
                     <ul className="dropdown-menu">
                       <p>Our services cover these industries and more...</p>
@@ -52,18 +46,9 @@ const Header = () => {
             </ul>
           </div>
           <div className="button flex">
-            {/* Conditionally render the Sign In or Sign Out button */}
-            {isLoggedIn ? (
-              <button className="btn1" onClick={handleSignOut}>
-                <i className="fa fa-sign-out"></i> Sign Out
-              </button>
-            ) : (
-              <Link to="/login">
-                <button className="btn1">
-                  <i className="fa fa-sign-in"></i> Sign In
-                </button>
-              </Link>
-            )}
+            <button className="btn1">
+              <i className="fa fa-sign-in"></i> Sign In
+            </button>
           </div>
 
           <div className="toggle">

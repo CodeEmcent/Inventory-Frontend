@@ -4,16 +4,13 @@ import './index.css';
 import App from './App';
 import { BrowserRouter as Router } from 'react-router-dom';  // Import BrowserRouter
 import reportWebVitals from './reportWebVitals';
-import { AuthProvider } from './contexts/AuthContext'; // Import AuthProvider
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <AuthProvider> {/* Wrap AuthProvider around Router */}
-      <Router> {/* BrowserRouter should wrap the App component */}
-        <App />
-      </Router>
-    </AuthProvider>
+    <Router> {/* Wrap the App in Router */}
+      <App />
+    </Router>
   </React.StrictMode>
 );
 

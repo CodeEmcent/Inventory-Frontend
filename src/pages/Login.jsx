@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";  // Import the useAuth hook
 import {
     Box,
     Button,
@@ -15,6 +16,7 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
+    const { login } = useAuth(); // Access the login function from AuthContext
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,7 +27,8 @@ const Login = () => {
             });
             localStorage.setItem("accessToken", response.data.access);
             localStorage.setItem("refreshToken", response.data.refresh);
-            navigate("/dashboard");
+            login(); // Update the authentication context
+            navigate("/dashboard"); // Redirect to the dashboard
         } catch (err) {
             setError("Invalid credentials. Please try again.");
         }
