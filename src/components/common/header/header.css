@@ -1,0 +1,182 @@
+/* Main Header Styles */
+.hero .highlighted-text {
+  color: #007bff; /* Apply the blue color to "Vault" */
+  font-weight: bold; /* Make it stand out with bold text */
+  text-transform: uppercase; /* Ensure the text is properly capitalized */ /* Adjust the size as needed */
+}
+
+header {
+  background-color: #fff;
+  height: 10vh;
+  box-shadow: 0 5px 30px rgb(0 22 84 / 10%);
+  padding: 15px 0;
+  position: sticky;
+  top: 0;
+  z-index: 99999;
+}
+header img {
+  width: 170px;
+}
+header a {
+  margin-left: 30px;
+  transition: 0.5s;
+  font-weight: 500;
+}
+header a:hover {
+  color: #007bff; /* Changed from #27ae60 to #007bff */
+}
+header span {
+  width: auto;
+  padding: 0px 6px;
+  background: #007bff; /* Changed from #27ae60 to #007bff */
+  border-radius: 50px;
+  color: #ffffff;
+  margin-right: 4px;
+  font-weight: 400;
+}
+header h4 {
+  font-weight: 500;
+  margin-right: 20px;
+}
+
+/* Style for dropdown menu */
+header .nav .dropdown {
+  position: relative;
+}
+
+header .nav .dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+header .dropdown-menu {
+  display: none;
+  position: absolute;
+  width: 500px;
+  top: 100%; /* Position below the dropdown item */
+  left: 0;
+  background-color: #fff;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 10000;
+  border-radius: 10px;  /* More rounded corners */
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0s 0.3s;
+}
+
+header .dropdown:hover .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease; /* When the dropdown is visible, fade it in */
+}
+
+header .dropdown-menu li a {
+  color: #333;
+  padding: 10px 15px;
+  display: block;
+  margin-left: 0;
+  text-decoration: none;
+}
+
+header .dropdown-menu li a:hover {
+  background-color: #007bff; /* Changed from #27ae60 to #007bff */
+  color: #fff;
+}
+
+/* Secondary Text Styling - Only shown on hover of specific nav item */
+
+/* Style the paragraph inside the dropdown */
+header .dropdown-menu p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;           /* Center the text */
+  margin: 10px 0;
+  padding: 10px 15px;
+  background-color: #007bff; /* Changed from #27ae60 to #007bff */
+  border-radius: 5px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  width: auto;                  /* Adjust the width */
+  max-width: 550px;             /* Limit the width for larger screens */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.secondary-nav-text {
+  display: none;
+  font-size: 1.1rem;
+  width: 80%;
+  color: #555;
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border-radius: 5px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: 100%; /* Position it below the hovered nav item */
+  left: 0;
+  z-index: 1000;
+}
+
+header .nav li:hover + .secondary-nav-text {
+  display: block; /* Show secondary text when a main nav item is hovered */
+}
+
+/* Optional: Add a little transition for smooth appearance */
+.secondary-nav-text {
+  transition: opacity 0.3s ease;
+}
+
+.nav li:hover + .secondary-nav-text {
+  opacity: 1;
+}
+
+/* Mobile Styles */
+header .toggle {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  header {
+    padding: 0;
+  }
+  header img {
+    margin-top: 30px;
+  }
+  header .button {
+    display: none;
+  }
+  header .nav .flex {
+    display: none;
+  }
+  header .toggle {
+    display: block;
+    margin-top: 20px;
+  }
+  header .small {
+    position: absolute;
+    top: 10vh;
+    left: 0;
+    width: 100%;
+    background-color: #007bff; /* Changed from #27ae60 to #007bff */
+    padding: 20px;
+  }
+  header li a {
+    display: inline-block;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+
+  /* Mobile Dropdowns */
+  header .dropdown-menu {
+    position: static; /* Make dropdown static in mobile view */
+    box-shadow: none;
+    background-color: #007bff; /* Changed from #27ae60 to #007bff */
+    padding: 0;
+  }
+
+  header .dropdown-menu li a {
+    color: #fff;
+  }
+}
