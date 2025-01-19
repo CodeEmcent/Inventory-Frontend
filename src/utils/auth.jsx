@@ -15,7 +15,7 @@ async function loginUser(email, password) {
         ] = `Bearer ${response.data.access}`;
 
         // Redirect to dashboard
-        window.location.href = "/dashboard";
+        window.location.href = "/admin-dashboard";
     } catch (error) {
         console.error("Login failed:", error.response?.data || error.message);
         alert("Login failed. Please check your credentials.");

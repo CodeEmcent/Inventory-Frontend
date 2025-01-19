@@ -20,7 +20,7 @@ const Register = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await axios.post("http://127.0.0.1:8000/api/register/", {
+            await axios.post("http://127.0.0.1:8000/api/users/register/", {
                 username,
                 email,
                 password,
@@ -74,7 +74,7 @@ const Register = () => {
                     fullWidth
                     required
                 />
-                <Button variant="contained" type="submit" fullWidth>
+                <Button variant="contained" type="submit" fullWidth sx={{ backgroundColor: "#007bff" }}>
                     Register
                 </Button>
             </Box>

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";  // Import the useAuth hook
+import { jwtDecode } from 'jwt-decode';  // Correct import for jwt-decode
 import {
     Box,
     Button,
@@ -21,26 +22,47 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://127.0.0.1:8000/token/", {
-                username: email, // Map email to 'username'
+            const response = await axios.post("http://127.0.0.1:8000/api/token/", {
+                username: email,  // Send email as the username
+                email: email,     // Send email explicitly as email
                 password,
             });
-            localStorage.setItem("accessToken", response.data.access);
+
+            // Save tokens to localStorage
+            const accessToken = response.data.access;
+            localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("refreshToken", response.data.refresh);
-            login(); // Update the authentication context
-            navigate("/dashboard"); // Redirect to the dashboard
+
+            // Decode the JWT token to extract the role
+            const decodedToken = jwtDecode(accessToken);  // Use the correct function name
+            console.log("Decoded Token:", decodedToken);
+            const role = decodedToken.role;
+
+            // Save the user role in localStorage
+            localStorage.setItem("role", role);
+
+            // Redirect based on the user role
+            if (role === "super_admin") {
+                navigate("/admin-dashboard");
+            } else if (role === "staff") {
+                navigate("/staff-dashboard");
+            } else {
+                setError("Unauthorized role.");
+            }
+
         } catch (err) {
+            console.error("Login error: ", err);
             setError("Invalid credentials. Please try again.");
         }
     };
 
     return (
-        <Container maxWidth="xs">
+        <Container maxWidth="xs" sx={{ height: { xs: "60vh", sm: "54vh", md: "50vh" } }}>
             <Box
                 component="form"
                 onSubmit={handleSubmit}
                 sx={{
-                    mt: 8,
+                    mt: 11.2,
                     p: 4,
                     display: "flex",
                     flexDirection: "column",
@@ -73,6 +95,7 @@ const Login = () => {
                 <Button variant="contained" type="submit" fullWidth>
                     Login
                 </Button>
+                <Link to="/register">Don't have an account? Register</Link>
             </Box>
         </Container>
     );

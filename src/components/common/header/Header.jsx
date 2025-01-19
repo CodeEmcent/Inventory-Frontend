@@ -46,9 +46,11 @@ const Header = () => {
             </ul>
           </div>
           <div className="button flex">
-            <button className="btn1">
-              <i className="fa fa-sign-in"></i> Sign In
-            </button>
+            <Link to="/login">
+              <button className="btn1">
+                <i className="fa fa-sign-in"></i> Sign In
+              </button>
+            </Link>
           </div>
 
           <div className="toggle">
