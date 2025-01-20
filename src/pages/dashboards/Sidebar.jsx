@@ -94,44 +94,13 @@ const Sidebar = ({ setCurrentSection, role }) => {
                     [`& .MuiDrawer-paper`]: {
                         width: 240,
                         boxSizing: "border-box",
-                        backgroundColor: "#1E293B", // Dark theme color
+                        backgroundColor: "#213d77", // Dark theme color
                         color: "#FFFFFF",
                     },
                 }}
             >
                 {/* Profile Section */}
-                {/* <Box sx={{ padding: 2, textAlign: "center", backgroundColor: "#0F172A", marginBottom: 2 }}>
-                    <Avatar
-                        src={profileImage || (profile?.profile_picture || "/path/to/default-image.jpg")}
-                        sx={{ width: 80, height: 80, margin: "0 auto", cursor: "pointer" }}
-                        alt="Profile Picture"
-                    />
-                    <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleProfileImageUpload}
-                        style={{ display: "none" }}
-                        id="profileImageInput"
-                    />
-                    <label htmlFor="profileImageInput">
-                        <IconButton component="span">
-                            <Typography variant="caption" sx={{ color: "#FFFFFF", mt: 1 }}>
-                                Change Photo
-                            </Typography>
-                        </IconButton>
-                    </label>
-                    <Typography variant="body1" sx={{ color: "#FFFFFF", fontWeight: "bold" }}>
-                        {profile?.username}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "#B0B0B0" }}>
-                        {profile?.organization?.name}
-                    </Typography>
-                    <Typography variant="body2" sx={{ color: "#B0B0B0" }}>
-                        {profile?.assigned_offices?.[0]?.name || "No office assigned"}
-                    </Typography>
-                </Box> */}
-
-                <Box sx={{ padding: 2, textAlign: "center", backgroundColor: "#0F172A", marginBottom: 2 }}>
+                <Box sx={{ padding: 2, textAlign: "center", backgroundColor: "#2151a2", marginBottom: 2 }}>
                     <Avatar
                         src={profileImage || (profile?.profile_picture || "/path/to/default-image.jpg")}
                         sx={{ width: 80, height: 80, margin: "0 auto", cursor: "pointer" }}
@@ -178,8 +147,15 @@ const Sidebar = ({ setCurrentSection, role }) => {
                         button
                         onClick={() => setCurrentSection("reports")}
                         sx={{
-                            "&:hover": { backgroundColor: "#334155" },
+                            "&:hover": { backgroundColor: "#FFF", color: "#2151a2" },
                             color: "#FFFFFF",
+                            cursor: "pointer",
+                            "& .MuiListItemIcon-root": {
+                                color: "#FFFFFF", // Set the icon color initially
+                                "&:hover": {
+                                    color: "#2151a2 !important", // Change icon color on hover
+                                },
+                            },
                         }}
                     >
                         <ListItemIcon>
@@ -194,8 +170,9 @@ const Sidebar = ({ setCurrentSection, role }) => {
                                 button
                                 onClick={() => setCurrentSection("userManagement")}
                                 sx={{
-                                    "&:hover": { backgroundColor: "#334155" },
+                                    "&:hover": { backgroundColor: "#FFF", color: "#2151a2" },
                                     color: "#FFFFFF",
+                                    cursor: "pointer"
                                 }}
                             >
                                 <ListItemIcon>
@@ -208,8 +185,9 @@ const Sidebar = ({ setCurrentSection, role }) => {
                                 button
                                 onClick={() => setCurrentSection("officeManagement")}
                                 sx={{
-                                    "&:hover": { backgroundColor: "#334155" },
+                                    "&:hover": { backgroundColor: "#FFF", color: "#2151a2" },
                                     color: "#FFFFFF",
+                                    cursor: "pointer"
                                 }}
                             >
                                 <ListItemIcon>
@@ -222,8 +200,9 @@ const Sidebar = ({ setCurrentSection, role }) => {
                                 button
                                 onClick={() => setCurrentSection("itemRegistry")}
                                 sx={{
-                                    "&:hover": { backgroundColor: "#334155" },
+                                    "&:hover": { backgroundColor: "#FFF", color: "#2151a2" },
                                     color: "#FFFFFF",
+                                    cursor: "pointer"
                                 }}
                             >
                                 <ListItemIcon>
@@ -236,8 +215,9 @@ const Sidebar = ({ setCurrentSection, role }) => {
                                 button
                                 onClick={() => setCurrentSection("inventory")}
                                 sx={{
-                                    "&:hover": { backgroundColor: "#334155" },
+                                    "&:hover": { backgroundColor: "#FFF", color: "#2151a2" },
                                     color: "#FFFFFF",
+                                    cursor: "pointer"
                                 }}
                             >
                                 <ListItemIcon>
@@ -256,8 +236,9 @@ const Sidebar = ({ setCurrentSection, role }) => {
                         button
                         onClick={handleLogoutClick}
                         sx={{
-                            "&:hover": { backgroundColor: "#334155" },
+                            "&:hover": { backgroundColor: "#FFF", color: "#2151a2" },
                             color: "#FFFFFF",
+                            cursor: "pointer"
                         }}
                     >
                         <ListItemIcon>
@@ -266,6 +247,7 @@ const Sidebar = ({ setCurrentSection, role }) => {
                         <ListItemText primary="Logout" />
                     </ListItem>
                 </List>
+
             </Drawer>
 
             {/* Logout Confirmation Dialog */}

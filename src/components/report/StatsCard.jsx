@@ -57,8 +57,20 @@ const Dashboard = () => {
 
     return (
         <Box sx={{ flexGrow: 1, padding: 3 }}>
-            <Typography variant="h4" gutterBottom>
-                Dashboard
+            <Typography
+                variant="h4"
+                gutterBottom
+                style={{
+                    textAlign: 'center',           // Center alignment
+                    textTransform: 'uppercase',    // Uppercase text
+                    letterSpacing: '3px',          // Spaced out characters
+                    fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
+                    fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
+                    fontWeight: 'bold',
+                    color: '#213d77',           // Bold font weight
+                }}
+            >
+                Inventory Summary
             </Typography>
 
             <Grid container spacing={3}>

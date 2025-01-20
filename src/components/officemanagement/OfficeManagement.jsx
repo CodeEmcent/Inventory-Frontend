@@ -6,6 +6,7 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
+    DialogContentText,
     DialogTitle,
     Table,
     TableBody,
@@ -15,18 +16,23 @@ import {
     TableRow,
     TextField,
     Typography,
+    IconButton,
 } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
-import API from "../../services/api"; // Assuming your API service is set up here
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import API from "../../services/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const OfficeManagement = () => {
     const [offices, setOffices] = useState([]);
     const [openModal, setOpenModal] = useState(false);
     const [formData, setFormData] = useState({ id: null, name: "", department: "" });
     const [isEditing, setIsEditing] = useState(false);
-    const navigate = useNavigate(); // Use navigate hook for redirection
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [officeToDelete, setOfficeToDelete] = useState(null);
+    const navigate = useNavigate();
 
     // Logout function
     const logoutUser = () => {
@@ -36,34 +42,14 @@ const OfficeManagement = () => {
         navigate("/login"); // Redirect to the login page
     };
 
-    // Fetch offices from the API
     const fetchOffices = async () => {
         try {
-            // Retrieve the access token from localStorage
-            const token = localStorage.getItem("accessToken");
-
-            // If no token is found, log out the user
-            if (!token) {
-                logoutUser();
-                return;
-            }
-
-            // If a token exists, proceed to fetch offices
-            const response = await API.get("/api/offices/", {
-                headers: {
-                    Authorization: `Bearer ${token}`,  // Include token in the Authorization header
-                }
-            });
-
-            // Set the response data to the state
+            const response = await API.get("/api/offices/");
             setOffices(response.data);
         } catch (error) {
             console.error("Error fetching offices:", error);
-
-            // If the error is a 401 Unauthorized, log the user out
-            if (error.response?.status === 401) {
-                logoutUser();  // Token is likely expired or invalid
-            }
+            if (error.response?.status === 401) logoutUser();
+            else toast.error("Failed to fetch offices.");
         }
     };
 
@@ -97,34 +83,61 @@ const OfficeManagement = () => {
                     name: formData.name,
                     department: formData.department,
                 });
+                toast.success("Office updated successfully.");
             } else {
                 await API.post("/api/offices/", {
                     name: formData.name,
                     department: formData.department,
                 });
+                toast.success("Office added successfully.");
             }
             fetchOffices(); // Refresh the office list
             handleCloseModal();
         } catch (error) {
             console.error("Error submitting form:", error);
+            toast.error("Office already exists. Please, create a new office.");
         }
     };
 
-    // Handle office deletion
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this office?")) {
-            try {
-                await API.delete(`/api/offices/${id}/`);
-                fetchOffices(); // Refresh the office list
-            } catch (error) {
-                console.error("Error deleting office:", error);
-            }
+    // Open delete confirmation dialog
+    const handleDeleteDialogOpen = (office) => {
+        setOfficeToDelete(office);
+        setDeleteDialogOpen(true);
+    };
+
+    // Close delete confirmation dialog
+    const handleDeleteDialogClose = () => {
+        setDeleteDialogOpen(false);
+        setOfficeToDelete(null);
+    };
+
+    // Confirm delete
+    const handleConfirmDelete = async () => {
+        try {
+            await API.delete(`/api/offices/${officeToDelete.id}/`);
+            toast.success("Office deleted successfully.");
+            fetchOffices();
+            handleDeleteDialogClose();
+        } catch (error) {
+            console.error("Error deleting office:", error);
+            toast.error("Failed to delete office.");
         }
     };
 
     return (
         <Box>
-            <Typography variant="h4" gutterBottom>
+            <Typography
+            variant="h4"
+            gutterBottom
+            style={{
+                textAlign: 'center',           // Center alignment
+                textTransform: 'uppercase',    // Uppercase text
+                letterSpacing: '3px',          // Spaced out characters
+                fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
+                fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
+                fontWeight: 'bold',            // Bold font weight
+            }}
+            >
                 Office Management
             </Typography>
             <Button
@@ -135,54 +148,6 @@ const OfficeManagement = () => {
             >
                 Add New Office
             </Button>
-            {/* <TableContainer>
-                <Table sx={{ border: 1, borderColor: 'grey.300' }}>
-                    <TableHead>
-                        <TableRow sx={{ borderBottom: 1, borderColor: 'grey.300' }}>
-                            <TableCell sx={{ fontWeight: 'bold', borderRight: 1, borderColor: 'grey.300' }}>
-                                Name
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', borderRight: 1, borderColor: 'grey.300' }}>
-                                Department
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', borderRight: 1, borderColor: 'grey.300' }}>
-                                Created At
-                            </TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {offices.map((office) => (
-                            <TableRow key={office.id} sx={{ borderBottom: 1, borderColor: 'grey.300' }}>
-                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300'}}>{office.name}</TableCell>
-                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300'}}>
-                                    {office.department || "N/A"}
-                                </TableCell>
-                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300'}}>
-                                    {new Date(office.created_at).toLocaleDateString()}
-                                </TableCell>
-                                <TableCell>
-                                    <Button
-                                        variant="outlined"
-                                        color="primary"
-                                        onClick={() => handleOpenModal(office)}
-                                        sx={{ marginRight: 1 }}
-                                    >
-                                        Edit
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        color="secondary"
-                                        onClick={() => handleDelete(office.id)}
-                                    >
-                                        Delete
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer> */}
 
             <TableContainer>
                 <Table sx={{ border: 1, borderColor: 'grey.300' }}>
@@ -278,7 +243,7 @@ const OfficeManagement = () => {
                                         </IconButton>
                                         <IconButton
                                             color="secondary"
-                                            onClick={() => handleDelete(office.id)}
+                                            onClick={() => handleDeleteDialogOpen(office)}
                                             aria-label="delete office"
                                         >
                                             <DeleteIcon />
@@ -321,6 +286,38 @@ const OfficeManagement = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={handleDeleteDialogClose}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+            >
+                <DialogTitle id="delete-dialog-title" sx={{ fontWeight: "bold", color: "red" }}>
+                    <Box display="flex" alignItems="center" justifyContent="center">
+                        <WarningAmberIcon fontSize="large" sx={{ color: "orange", marginRight: 1 }} />
+                        Confirm Deletion
+                    </Box>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description">
+                        Are you sure you want to delete the office{" "}
+                        <strong>{officeToDelete?.name}</strong>? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleDeleteDialogClose} variant="outlined" color="primary">
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} variant="contained" color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Toast Notifications */}
+            <ToastContainer position="top-center" autoClose={3000} />
         </Box>
     );
 };

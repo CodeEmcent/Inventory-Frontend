@@ -4,7 +4,7 @@ import { Box, Typography, AppBar, Toolbar } from "@mui/material";
 
 const Header = ({ dashboardName, welcomeMessage }) => {
     return (
-        <AppBar position="static" sx={{ backgroundColor: "#1E293B", color: "#FFFFFF" }}>
+        <AppBar position="static" sx={{ backgroundColor: "#213d77", color: "#FFFFFF" }}>
             <Toolbar>
                 {/* Welcome Note */}
                 <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "left" }}>
@@ -12,7 +12,13 @@ const Header = ({ dashboardName, welcomeMessage }) => {
                 </Typography>
 
                 {/* Dashboard Name */}
-                <Typography variant="h5" sx={{ textAlign: "center", flexGrow: 1 }}>
+                <Typography
+                    variant="h5"
+                    gutterBottom
+                    sx={{
+                        textTransform: 'uppercase',          // Spaced out characters
+                        fontWeight: 'bold',            // Bold font weight                
+                    }}>
                     {dashboardName}
                 </Typography>
             </Toolbar>

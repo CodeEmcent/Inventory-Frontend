@@ -22,12 +22,45 @@ API.interceptors.request.use(
 // Handle response errors globally
 API.interceptors.response.use(
     (response) => response,
-    (error) => {
-        if (error.response && error.response.status === 401) {
-            console.warn('Unauthorized! Redirecting to login...');
-            localStorage.removeItem('accessToken');
-            window.location.href = '/login'; // Adjust as needed for your app's routing
+    async (error) => {
+        const originalRequest = error.config;
+
+        if (error.response && error.response.status === 401 && !originalRequest._retry) {
+            // Handle token expiration (401 Unauthorized)
+            originalRequest._retry = true;
+
+            try {
+                const refreshToken = localStorage.getItem('refreshToken');
+                if (!refreshToken) {
+                    throw new Error('No refresh token found');
+                }
+
+                // Request a new access token using the refresh token
+                const response = await axios.post(
+                    'http://127.0.0.1:8000/token/refresh/', 
+                    { refresh: refreshToken }
+                );
+
+                // Save new access token
+                localStorage.setItem('accessToken', response.data.access);
+
+                // Set the Authorization header with the new token
+                API.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
+
+                // Retry the original request with the new access token
+                return API(originalRequest);
+
+            } catch (refreshError) {
+                console.error('Token refresh failed:', refreshError);
+
+                // Handle failed refresh (e.g., logout the user)
+                localStorage.clear();
+                window.location.href = '/login'; // Redirect to login page
+                return Promise.reject(refreshError);
+            }
         }
+
+        // Other errors, such as network or 500 server errors
         return Promise.reject(error);
     }
 );

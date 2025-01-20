@@ -6,6 +6,7 @@ import {
     Dialog,
     DialogActions,
     DialogContent,
+    DialogContentText,
     DialogTitle,
     Table,
     TableBody,
@@ -15,15 +16,18 @@ import {
     TableRow,
     TextField,
     Typography,
+    IconButton,
     Select,
     MenuItem,
     FormControl,
     InputLabel,
 } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import API from "../../services/api";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]); // Initialize users as an empty array
@@ -32,11 +36,14 @@ const UserManagement = () => {
     const [formData, setFormData] = useState({
         id: null,
         username: "",
+        first_name: "",
+        last_name: "",
         email: "",
-        role: "staff",
-        assigned_offices: [],
+        password: "",
     });
     const [isEditing, setIsEditing] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null); // Store the user to delete
     const navigate = useNavigate();
 
     // Logout function
@@ -70,6 +77,7 @@ const UserManagement = () => {
                 logoutUser();
             } else {
                 console.error("Error fetching data:", error);
+                toast.error("Failed to fetch user data.");
             }
         }
     }, [logoutUser]);
@@ -111,18 +119,20 @@ const UserManagement = () => {
             setFormData({
                 id: user.id,
                 username: user.username,
+                first_name: user.first_name,
+                last_name: user.last_name,
                 email: user.email,
-                role: user.role,
-                assigned_offices: user.assigned_offices.map((office) => office.id),
+                password: user.password,
             });
         } else {
             setIsEditing(false);
             setFormData({
                 id: null,
                 username: "",
+                first_name: "",
+                last_name: "",
                 email: "",
-                role: "staff",
-                assigned_offices: [],
+                password: "",
             });
         }
         setOpenModal(true);
@@ -137,26 +147,43 @@ const UserManagement = () => {
     const handleSubmit = async () => {
         try {
             if (isEditing) {
-                await API.put(`/api/users/${formData.id}/`, formData);
+                await API.put(`/api/users/update/${formData.id}/`, formData);
+                toast.success("User updated successfully.");
             } else {
-                await API.post("/api/users/", formData);
+                await API.post("/api/users/register/", formData);
+                toast.success("User created successfully.");
             }
-            fetchData();
+            await fetchData();
             handleCloseModal();
         } catch (error) {
             console.error("Error submitting form:", error);
+            toast.error("Failed to submit user data.");
         }
     };
+    
 
-    // Delete user
-    const handleDelete = async (id) => {
-        if (window.confirm("Are you sure you want to delete this user?")) {
-            try {
-                await API.delete(`/api/users/${id}/`);
-                fetchData();
-            } catch (error) {
-                console.error("Error deleting user:", error);
-            }
+    // Open delete confirmation dialog
+    const handleDeleteDialogOpen = (user) => {
+        setUserToDelete(user);
+        setDeleteDialogOpen(true);
+    };
+
+    // Close delete confirmation dialog
+    const handleDeleteDialogClose = () => {
+        setDeleteDialogOpen(false);
+        setUserToDelete(null);
+    };
+
+    // Confirm delete user
+    const handleConfirmDelete = async () => {
+        try {
+            await API.delete(`/api/users/delete/${userToDelete.id}/`);
+            toast.success("User deleted successfully.");
+            await fetchData();
+            handleDeleteDialogClose();
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            toast.error("Failed to delete user.");
         }
     };
 
@@ -180,6 +207,12 @@ const UserManagement = () => {
                         <TableRow sx={{ borderBottom: 1, borderColor: 'grey.300' }}>
                             <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
                                 Username
+                            </TableCell>
+                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                                First Name
+                            </TableCell>
+                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                                Last Name
                             </TableCell>
                             <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
                                 Email
@@ -213,6 +246,24 @@ const UserManagement = () => {
                                         }}
                                     >
                                         {user.username}
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            borderRight: 1,
+                                            borderColor: 'grey.300',
+                                            padding: '0 8px', // Reduce padding for compact layout
+                                        }}
+                                    >
+                                        {user.first_name}
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            borderRight: 1,
+                                            borderColor: 'grey.300',
+                                            padding: '0 8px', // Reduce padding for compact layout
+                                        }}
+                                    >
+                                        {user.last_name}
                                     </TableCell>
                                     <TableCell
                                         sx={{
@@ -257,7 +308,7 @@ const UserManagement = () => {
                                         </IconButton>
                                         <IconButton
                                             color="secondary"
-                                            onClick={() => handleDelete(user.id)}
+                                            onClick={() => handleDeleteDialogOpen(user)}
                                             aria-label="delete user"
                                         >
                                             <DeleteIcon />
@@ -284,39 +335,37 @@ const UserManagement = () => {
                     />
                     <TextField
                         margin="dense"
+                        label="First Name"
+                        name="first_name"
+                        fullWidth
+                        value={formData.first_name}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
+                        label="Last Name"
+                        name="last_name"
+                        fullWidth
+                        value={formData.last_name}
+                        onChange={handleChange}
+                    />
+                    <TextField
+                        margin="dense"
                         label="Email"
                         name="email"
                         fullWidth
                         value={formData.email}
                         onChange={handleChange}
                     />
-                    <FormControl fullWidth margin="dense">
-                        <InputLabel>Role</InputLabel>
-                        <Select
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                        >
-                            <MenuItem value="super_admin">Super Admin</MenuItem>
-                            <MenuItem value="admin">Admin</MenuItem>
-                            <MenuItem value="staff">Staff</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl fullWidth margin="dense">
-                        <InputLabel>Assigned Offices</InputLabel>
-                        <Select
-                            multiple
-                            name="assigned_offices"
-                            value={formData.assigned_offices}
-                            onChange={handleOfficeChange}
-                        >
-                            {offices.map((office) => (
-                                <MenuItem key={office.id} value={office.id}>
-                                    {office.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
+                    <TextField
+                        margin="dense"
+                        label="Password"
+                        name="password"
+                        type="password"
+                        fullWidth
+                        value={formData.password}
+                        onChange={handleChange}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseModal} color="secondary">
@@ -327,6 +376,45 @@ const UserManagement = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <Dialog
+                open={deleteDialogOpen}
+                onClose={handleDeleteDialogClose}
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+                sx={{
+                    "& .MuiDialog-paper": {
+                        borderRadius: 2,
+                        padding: 2,
+                        maxWidth: "400px",
+                        margin: "auto",
+                        textAlign: "center",
+                    },
+                }}
+            >
+                <DialogTitle id="delete-dialog-title" sx={{ fontWeight: "bold", color: "red" }}>
+                    <Box display="flex" alignItems="center" justifyContent="center">
+                        <WarningAmberIcon fontSize="large" sx={{ color: "orange", marginRight: 1 }} />
+                        Confirm Deletion
+                    </Box>
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-dialog-description" sx={{ fontSize: "1rem" }}>
+                    Are you sure you want to delete user{" "}
+                    <strong>{userToDelete?.username}</strong>? This action cannot be undone.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: "center" }}>
+                    <Button onClick={handleDeleteDialogClose} variant="outlined" color="primary" sx={{ cursor: "pointer" }}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleConfirmDelete} variant="contained" color="error" sx={{ cursor: "pointer" }}>
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Toast Notifications */}
+            <ToastContainer position="top-center" autoClose={3000} />
         </Box>
     );
 };
