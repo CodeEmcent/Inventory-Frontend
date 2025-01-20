@@ -10,7 +10,16 @@ import {
     Select,
     CircularProgress,
 } from "@mui/material";
-import API from "../../services/api"; // Adjust to your API service path
+import {
+    Edit,
+    Add,
+    FileDownload,
+    CloudUpload,
+    UploadFile,
+    FileUpload,
+    TableChart,
+} from "@mui/icons-material";
+import API from "../../services/api";
 
 const InventoryTools = () => {
     const [offices, setOffices] = useState([]);
@@ -18,6 +27,15 @@ const InventoryTools = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [year, setYear] = useState(new Date().getFullYear());
+    const [openModal, setOpenModal] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [formData, setFormData] = useState({
+        id: null,
+        office: "",
+        item_id: "",
+        quantity: 1,
+        remarks: "Perfect",
+    });
 
     // Fetch offices for dropdown
     useEffect(() => {
@@ -32,7 +50,30 @@ const InventoryTools = () => {
         fetchOffices();
     }, []);
 
-    // Handle template download
+    // Open modal for adding or editing inventory
+    const handleOpenModal = (inventoryItem = null) => {
+        if (inventoryItem) {
+            setIsEditing(true);
+            setFormData({
+                id: inventoryItem.id,
+                office: inventoryItem.office || "",
+                item_id: inventoryItem.item_id || "",
+                quantity: inventoryItem.quantity || 1,
+                remarks: inventoryItem.remarks || "Perfect",
+            });
+        } else {
+            setIsEditing(false);
+            setFormData({
+                id: null,
+                office: "",
+                item_id: "",
+                quantity: 1,
+                remarks: "Perfect",
+            });
+        }
+        setOpenModal(true);
+    };
+
     const handleTemplateDownload = async () => {
         if (!selectedOffice) {
             alert("Please select an office.");
@@ -42,7 +83,7 @@ const InventoryTools = () => {
         try {
             setIsLoading(true);
             const response = await API.get(`/api/template/${selectedOffice}/`, {
-                responseType: "blob", // To handle file downloads
+                responseType: "blob",
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement("a");
@@ -58,12 +99,10 @@ const InventoryTools = () => {
         }
     };
 
-    // Handle file selection for import
     const handleFileChange = (e) => {
         setSelectedFile(e.target.files[0]);
     };
 
-    // Handle inventory import
     const handleImport = async () => {
         if (!selectedOffice || !selectedFile) {
             alert("Please select an office and a file.");
@@ -87,7 +126,6 @@ const InventoryTools = () => {
         }
     };
 
-    // Handle inventory export
     const handleExport = async () => {
         if (!selectedOffice) {
             alert("Please select an office.");
@@ -97,7 +135,7 @@ const InventoryTools = () => {
         try {
             setIsLoading(true);
             const response = await API.get(`/api/export/?office_id=${selectedOffice}`, {
-                responseType: "blob", // To handle file downloads
+                responseType: "blob",
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement("a");
@@ -113,7 +151,6 @@ const InventoryTools = () => {
         }
     };
 
-    // Handle broadsheet generation
     const handleBroadsheet = async () => {
         if (!year) {
             alert("Please specify a year.");
@@ -123,7 +160,7 @@ const InventoryTools = () => {
         try {
             setIsLoading(true);
             const response = await API.get(`/api/broadsheet/?year=${year}`, {
-                responseType: "blob", // To handle file downloads
+                responseType: "blob",
             });
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement("a");
@@ -141,9 +178,23 @@ const InventoryTools = () => {
 
     return (
         <Box>
-            <Typography variant="h4" gutterBottom>
+            <Typography
+                variant="subtitle2"
+                gutterBottom
+                style={{
+                    textAlign: 'center',           // Center alignment
+                    textTransform: 'capitalize',    // Uppercase text
+                    letterSpacing: '3px',          // Spaced out characters
+                    fontSize: '1rem',            // Adjusted font size (you can tweak this value as needed)
+                    fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
+                    fontWeight: 'bold',
+                    fontStyle: 'italic',           // Bold font weight
+                    marginTop: '50px',
+                }}
+            >
                 Manage Inventory
             </Typography>
+
             <FormControl fullWidth margin="dense">
                 <InputLabel>Office</InputLabel>
                 <Select
@@ -157,24 +208,36 @@ const InventoryTools = () => {
                     ))}
                 </Select>
             </FormControl>
-            <Box sx={{ marginTop: 2 }}>
+            <Box sx={{ marginTop: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
                 <Button
                     variant="contained"
                     color="primary"
+                    startIcon={<FileDownload />}
                     onClick={handleTemplateDownload}
                     disabled={isLoading}
-                    sx={{ marginRight: 2 }}
+                    sx={{
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                        height: "40px",
+                    }}
                 >
-                    Download Template
+                    Template
                 </Button>
                 <Button
                     variant="contained"
                     color="secondary"
+                    startIcon={<CloudUpload />}
                     component="label"
                     disabled={isLoading}
-                    sx={{ marginRight: 2 }}
+                    sx={{
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                        height: "40px",
+                    }}
                 >
-                    Import Inventory
+                    Import
                     <input
                         type="file"
                         hidden
@@ -184,40 +247,59 @@ const InventoryTools = () => {
                 <Button
                     variant="contained"
                     color="success"
+                    startIcon={<UploadFile />}
                     onClick={handleImport}
                     disabled={!selectedFile || isLoading}
-                    sx={{ marginRight: 2 }}
+                    sx={{
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                        height: "40px",
+                    }}
                 >
-                    Upload File
+                    Upload
                 </Button>
                 <Button
                     variant="contained"
                     color="info"
+                    startIcon={<FileUpload />}
                     onClick={handleExport}
                     disabled={isLoading}
+                    sx={{
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                        height: "40px",
+                    }}
                 >
-                    Export Inventory
+                    Export
                 </Button>
             </Box>
-            <Box sx={{ marginTop: 4 }}>
+            <Box sx={{ marginTop: 4, display: "flex", alignItems: "center", gap: 2 }}>
                 <TextField
                     label="Year for Broadsheet"
                     type="number"
-                    fullWidth
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
                     margin="dense"
+                    sx={{ flex: 1 }}
                 />
                 <Button
                     variant="contained"
-                    color="primary"
+                    color="error"
+                    startIcon={<TableChart />}
                     onClick={handleBroadsheet}
                     disabled={isLoading}
-                    sx={{ marginTop: 2 }}
+                    sx={{
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                        borderRadius: "8px",
+                        height: "40px",
+                    }}
                 >
-                    Generate Broadsheet
+                    Broadsheet
                 </Button>
-                {isLoading && <CircularProgress sx={{ marginLeft: 2 }} />}
+                {isLoading && <CircularProgress />}
             </Box>
         </Box>
     );
