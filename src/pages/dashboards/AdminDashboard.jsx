@@ -1,23 +1,19 @@
 import { useState, useEffect } from "react";
-import {
-    Box,
-    Grid,
-    Typography,
-    Container,
-} from "@mui/material";
-import InventoryList from "../../components/inventory/InventoryList";
-import AddInventory from "../../components/inventory/AddInventory";
-import UserManagement from "../../components/usermanagement/UserManagement"; // New Component for user management
-import OfficeManagement from "../../components/officemanagement/OfficeManagement"; // New Component for office management
-import StatsCard from "../../components/stats/StatsCard";
+import { jwtDecode } from "jwt-decode"; // Fixed import
+import { Box, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode"; // Fix import typo
 import Sidebar from "../../pages/dashboards/Sidebar"; // Adjust the import path if necessary
+import DashboardHeader from "./DashboardHeader"; // Header Component
+import UserManagement from "../../components/usermanagement/UserManagement";
+import OfficeManagement from "../../components/officemanagement/OfficeManagement";
 import ItemRegistry from "../../components/registry/ItemRegistry";
+import InventoryDashboard from "../../components/inventory/InventoryDashboard";
+import Dashboard from "../../components/report/StatsCard";
 
 const AdminDashboard = () => {
-    const [currentSection, setCurrentSection] = useState("inventory");
-    const [role, setrole] = useState("");
+    // Set the default section to "reports"
+    const [currentSection, setCurrentSection] = useState("reports");
+    const [role, setRole] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -26,18 +22,18 @@ const AdminDashboard = () => {
             navigate("/login"); // Redirect to login if no token
             return;
         }
-    
+
         try {
             const decodedToken = jwtDecode(token);
-            const userRole = decodedToken.role;
-    
+            const role = decodedToken.role;
+
             // Check for valid roles
-            if (!["admin", "super_admin"].includes(userRole)) {
+            if (!["admin", "super_admin"].includes(role)) {
                 navigate("/unauthorized");
             }
-    
+
             // Optional: Save role for conditional rendering
-            setrole(userRole);
+            setRole(role);
         } catch (error) {
             console.error("Error decoding token:", error);
             navigate("/login");
@@ -54,34 +50,28 @@ const AdminDashboard = () => {
             <Sidebar setCurrentSection={handleSectionChange} role={role} />
 
             {/* Main Content */}
-            <Box sx={{ flexGrow: 1, p: 2 }}>
-                <Container>
-                    <Typography variant="h4" gutterBottom>
-                        Admin Dashboard
-                    </Typography>
-                    <Grid container spacing={2}>
-                        {/* Stats Cards */}
-                        <Grid item xs={12} sm={4}>
-                            <StatsCard title="Total Items" value={120} />
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <StatsCard title="Total Categories" value={8} />
-                        </Grid>
-                        <Grid item xs={12} sm={4}>
-                            <StatsCard title="Items Sold" value={50} />
-                        </Grid>
-                    </Grid>
-
+            <Box sx={{ flexGrow: 1 }}>
+                {/* Admin Header */}
+                <DashboardHeader
+                    dashboardName="Admin Dashboard"
+                    welcomeMessage="Hello & Welcome to the Admin Dashboard"
+                />
+                <Container sx={{ paddingTop: 3 }}>
                     {/* Section Rendering */}
-                    {currentSection === "inventory" && <InventoryList />}
-                    {currentSection === "addInventory" && <AddInventory />}
                     {currentSection === "userManagement" && role === "super_admin" && (
                         <UserManagement />
                     )}
-                    {currentSection === "officeManagement" && <OfficeManagement />}
-                    {currentSection === "itemRegistry" && <ItemRegistry />}
+                    {currentSection === "officeManagement" && role === "super_admin" && (
+                        <OfficeManagement />
+                    )}
+                    {currentSection === "itemRegistry" && role === "super_admin" && (
+                        <ItemRegistry />
+                    )}
+                    {currentSection === "inventory" && role === "super_admin" && (
+                        <InventoryDashboard />
+                    )}
                     {currentSection === "reports" && role === "super_admin" && (
-                        <Typography variant="h6">Reports Section Coming Soon...</Typography>
+                        <Dashboard />
                     )}
                 </Container>
             </Box>

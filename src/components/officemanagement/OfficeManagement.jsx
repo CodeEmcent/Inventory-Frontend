@@ -16,6 +16,9 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import API from "../../services/api"; // Assuming your API service is set up here
 
 const OfficeManagement = () => {
@@ -132,7 +135,7 @@ const OfficeManagement = () => {
             >
                 Add New Office
             </Button>
-            <TableContainer>
+            {/* <TableContainer>
                 <Table sx={{ border: 1, borderColor: 'grey.300' }}>
                     <TableHead>
                         <TableRow sx={{ borderBottom: 1, borderColor: 'grey.300' }}>
@@ -151,11 +154,11 @@ const OfficeManagement = () => {
                     <TableBody>
                         {offices.map((office) => (
                             <TableRow key={office.id} sx={{ borderBottom: 1, borderColor: 'grey.300' }}>
-                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300' }}>{office.name}</TableCell>
-                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300' }}>
+                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300'}}>{office.name}</TableCell>
+                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300'}}>
                                     {office.department || "N/A"}
                                 </TableCell>
-                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300' }}>
+                                <TableCell sx={{ borderRight: 1, borderColor: 'grey.300'}}>
                                     {new Date(office.created_at).toLocaleDateString()}
                                 </TableCell>
                                 <TableCell>
@@ -179,7 +182,114 @@ const OfficeManagement = () => {
                         ))}
                     </TableBody>
                 </Table>
+            </TableContainer> */}
+
+            <TableContainer>
+                <Table sx={{ border: 1, borderColor: 'grey.300' }}>
+                    <TableHead>
+                        <TableRow
+                            sx={{
+                                borderBottom: 1,
+                                borderColor: 'grey.300',
+                                height: '40px', // Reduce header row height
+                            }}
+                        >
+                            <TableCell
+                                sx={{
+                                    fontWeight: 'bold',
+                                    borderRight: 1,
+                                    borderColor: 'grey.300',
+                                    padding: '8px', // Reduce padding
+                                }}
+                            >
+                                Name
+                            </TableCell>
+                            <TableCell
+                                sx={{
+                                    fontWeight: 'bold',
+                                    borderRight: 1,
+                                    borderColor: 'grey.300',
+                                    padding: '8px',
+                                }}
+                            >
+                                Department
+                            </TableCell>
+                            <TableCell
+                                sx={{
+                                    fontWeight: 'bold',
+                                    borderRight: 1,
+                                    borderColor: 'grey.300',
+                                    padding: '8px',
+                                }}
+                            >
+                                Created At
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', padding: '8px' }}>Actions</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {offices.map((office) => (
+                            <TableRow
+                                key={office.id}
+                                sx={{
+                                    borderBottom: 1,
+                                    borderColor: 'grey.300',
+                                    height: '36px', // Reduce body row height
+                                }}
+                            >
+                                <TableCell
+                                    sx={{
+                                        borderRight: 1,
+                                        borderColor: 'grey.300',
+                                        padding: '6px', // Compact padding
+                                    }}
+                                >
+                                    {office.name}
+                                </TableCell>
+                                <TableCell
+                                    sx={{
+                                        borderRight: 1,
+                                        borderColor: 'grey.300',
+                                        padding: '6px',
+                                    }}
+                                >
+                                    {office.department || "N/A"}
+                                </TableCell>
+                                <TableCell
+                                    sx={{
+                                        borderRight: 1,
+                                        borderColor: 'grey.300',
+                                        padding: '6px',
+                                    }}
+                                >
+                                    {new Date(office.created_at).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell
+                                    sx={{
+                                        padding: '0 8px',
+                                    }}
+                                >
+                                    <IconButton
+                                            color="primary"
+                                            onClick={() => handleOpenModal(office)}
+                                            aria-label="edit office"
+                                        >
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton
+                                            color="secondary"
+                                            onClick={() => handleDelete(office.id)}
+                                            aria-label="delete office"
+                                        >
+                                            <DeleteIcon />
+                                        </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
             </TableContainer>
+
 
             {/* Add/Edit Modal */}
             <Dialog open={openModal} onClose={handleCloseModal}>

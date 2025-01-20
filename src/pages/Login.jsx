@@ -95,7 +95,12 @@ const Login = () => {
                 <Button variant="contained" type="submit" fullWidth>
                     Login
                 </Button>
-                <Link to="/register">Don't have an account? Register</Link>
+                <Link
+                    to="/register"
+                    style={{ fontStyle: 'italic', fontSize: '12px' }} // Apply italic and reduce font size
+                >
+                    Don't have an account? Register
+                </Link>
             </Box>
         </Container>
     );

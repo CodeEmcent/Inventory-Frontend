@@ -36,7 +36,7 @@ const ImportExportButtons = () => {
             <Button
                 variant="contained"
                 onClick={() => handleDownload('download')}
-                sx={{ marginRight: 2 }}
+                sx={{ marginRight: 2, textTransform: 'capitalize' }}
             >
                 Download Registry
             </Button>
@@ -44,28 +44,10 @@ const ImportExportButtons = () => {
             <Button
                 variant="contained"
                 onClick={() => handleDownload('template')}
-                sx={{ marginRight: 2 }}
+                sx={{ marginRight: 2, textTransform: 'capitalize' }}
             >
                 Download Template
             </Button>
-
-            {/* Trigger file input visibility */}
-            <Button
-                variant="contained"
-                onClick={toggleFileInput}
-            >
-                Upload Registry
-            </Button>
-
-            {/* Conditionally render the file input */}
-            {showFileInput && (
-                <input
-                    type="file"
-                    accept=".xlsx"
-                    onChange={handleImport}
-                    style={{ marginTop: '10px' }}
-                />
-            )}
         </div>
     );
 };

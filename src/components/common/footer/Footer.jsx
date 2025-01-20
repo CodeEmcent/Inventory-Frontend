@@ -7,7 +7,7 @@ const Footer = () => {
     <>
       <section className='footerContact'>
         <div className='container'>
-          <p>Register with us today to acccess your most simplified inventory manager.</p>
+          <p>"Smart Solutions for Smarter Inventory . . . ."</p>
         </div>
     </section >
 

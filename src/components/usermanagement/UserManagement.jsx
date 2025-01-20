@@ -20,6 +20,9 @@ import {
     FormControl,
     InputLabel,
 } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import API from "../../services/api";
 
 const UserManagement = () => {
@@ -190,38 +193,80 @@ const UserManagement = () => {
                             <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
+
                     <TableBody>
                         {Array.isArray(users) &&
                             users.map((user) => (
-                                <TableRow key={user.id} sx={{ borderBottom: 1, borderColor: 'grey.300' }}>
-                                    <TableCell sx={{ borderRight: 1, borderColor: 'grey.300' }}>{user.username}</TableCell>
-                                    <TableCell sx={{ borderRight: 1, borderColor: 'grey.300' }}>{user.email}</TableCell>
-                                    <TableCell sx={{ borderRight: 1, borderColor: 'grey.300' }}>{user.role}</TableCell>
-                                    <TableCell sx={{ borderRight: 1, borderColor: 'grey.300' }}>
+                                <TableRow
+                                    key={user.id}
+                                    sx={{
+                                        borderBottom: 1,
+                                        borderColor: 'grey.300',
+                                        height: '40px', // Reduce the row height
+                                    }}
+                                >
+                                    <TableCell
+                                        sx={{
+                                            borderRight: 1,
+                                            borderColor: 'grey.300',
+                                            padding: '0 8px', // Reduce padding for compact layout
+                                        }}
+                                    >
+                                        {user.username}
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            borderRight: 1,
+                                            borderColor: 'grey.300',
+                                            padding: '0 8px',
+                                        }}
+                                    >
+                                        {user.email}
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            borderRight: 1,
+                                            borderColor: 'grey.300',
+                                            padding: '0 8px',
+                                        }}
+                                    >
+                                        {user.role}
+                                    </TableCell>
+                                    <TableCell
+                                        sx={{
+                                            borderRight: 1,
+                                            borderColor: 'grey.300',
+                                            padding: '0 8px',
+                                        }}
+                                    >
                                         {user.assigned_offices
                                             .map((office) => office.name)
                                             .join(", ") || "N/A"}
                                     </TableCell>
-                                    <TableCell>
-                                        <Button
-                                            variant="outlined"
+                                    <TableCell
+                                        sx={{
+                                            padding: '0 8px',
+                                        }}
+                                    >
+                                        <IconButton
                                             color="primary"
                                             onClick={() => handleOpenModal(user)}
-                                            sx={{ marginRight: 1 }}
+                                            aria-label="edit user"
                                         >
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            variant="outlined"
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton
                                             color="secondary"
                                             onClick={() => handleDelete(user.id)}
+                                            aria-label="delete user"
                                         >
-                                            Delete
-                                        </Button>
+                                            <DeleteIcon />
+                                        </IconButton>
                                     </TableCell>
                                 </TableRow>
                             ))}
                     </TableBody>
+
                 </Table>
             </TableContainer>
 

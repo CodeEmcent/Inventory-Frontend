@@ -4,6 +4,9 @@ import API from '../../services/api';
 import { useNavigate } from "react-router-dom";
 import ImportExportButtons from './ImportExportButtons';  // Make sure this is correctly imported
 import RegistryImport from './RegistryImport';
+import IconButton from "@mui/material/IconButton";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const ItemRegistry = () => {
     const [items, setItems] = useState([]);
@@ -14,12 +17,9 @@ const ItemRegistry = () => {
     const [loading, setLoading] = useState(false);
     const [sortColumn, setSortColumn] = useState('name'); // Added sort column state
     const [sortDirection, setSortDirection] = useState('asc');  // Default to ascending
-    const toggleSortDirection = () => {
-        setSortDirection(prevDirection => prevDirection === 'asc' ? 'desc' : 'asc');
-    };    
     const navigate = useNavigate();
 
-    // Logout function
+    // Define logoutUser function
     const logoutUser = () => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
@@ -34,7 +34,7 @@ const ItemRegistry = () => {
             logoutUser();  // If no token, log out user
             return;
         }
-    
+
         setLoading(true);  // Set loading to true while fetching
         try {
             const response = await API.get('/api/registry/view', {
@@ -42,16 +42,16 @@ const ItemRegistry = () => {
                     Authorization: `Bearer ${token}`,
                 }
             });
-    
+
             console.log('API Response Status:', response.status);  // Log the response status for debugging
-    
+
             // Sort the items based on the direction
             const sortedItems = response.data.item_registry.sort((a, b) => {
                 if (a.name < b.name) return sortDirection === 'asc' ? -1 : 1;
                 if (a.name > b.name) return sortDirection === 'asc' ? 1 : -1;
                 return 0;
             });
-    
+
             setItems(sortedItems); // Set the sorted items to state
         } catch (error) {
             console.error('Error fetching items:', error.response ? error.response.data : error.message);
@@ -65,20 +65,21 @@ const ItemRegistry = () => {
         fetchItems();
     }, []);
 
-    // Handle sorting
+    // Handle sorting by column
     const handleSort = (column) => {
-        const newSortDirection = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc'; // Toggle sort direction
+        const newSortDirection = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
         setSortColumn(column);
         setSortDirection(newSortDirection);
 
         const sortedItems = [...items].sort((a, b) => {
-            if (a[column] < b[column]) return sortDirection === 'asc' ? -1 : 1;
-            if (a[column] > b[column]) return sortDirection === 'asc' ? 1 : -1;
+            if (a[column] < b[column]) return newSortDirection === 'asc' ? -1 : 1;
+            if (a[column] > b[column]) return newSortDirection === 'asc' ? 1 : -1;
             return 0;
         });
 
         setItems(sortedItems);
     };
+
 
     // Handle opening the dialog (edit mode or add mode)
     const handleOpenDialog = (item = null) => {
@@ -90,6 +91,11 @@ const ItemRegistry = () => {
             setCurrentItem({ name: '', description: '' });
         }
         setOpenDialog(true);
+    };
+
+    // Rename handleOpenModal to handleOpenDialog (or use handleOpenModal as a wrapper for handleOpenDialog)
+    const handleOpenModal = (item) => {
+        handleOpenDialog(item);
     };
 
     // Handle closing the dialog
@@ -129,42 +135,75 @@ const ItemRegistry = () => {
     return (
         <Box>
             <Typography variant="h4" gutterBottom>Item Registry</Typography>
-            
+
             {/* Align the buttons and import/export section */}
             <Stack direction="row" spacing={2} sx={{ marginBottom: 2 }}>
-                <Button variant="contained" color="primary" onClick={() => handleOpenDialog()}>Add New Item</Button>
+                <Button variant="contained" color="primary" onClick={() => handleOpenDialog()} sx={{ textTransform: 'capitalize' }}>Add New Item</Button>
                 <ImportExportButtons /> {/* This component will be placed here */}
                 <RegistryImport />
             </Stack>
-            
+
             {message && <Typography color="primary">{message}</Typography>}
             {loading && <Typography>Loading...</Typography>}
-            
+
             <TableContainer sx={{ border: '1px solid #ccc' }}>
                 <Table sx={{ borderCollapse: 'collapse', width: '100%' }}>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc' }}>Stock ID</TableCell>
-                            <TableCell 
-                                sx={{ fontWeight: 'bold', border: '1px solid #ccc', cursor: 'pointer' }} 
-                                onClick={toggleSortDirection}
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '4px 8px' }}>
+                                Stock ID
+                            </TableCell>
+                            <TableCell
+                                sx={{
+                                    fontWeight: 'bold',
+                                    border: '1px solid #ccc',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => handleSort('name')} // Sort by name
                             >
                                 Name
-                                {sortDirection === 'asc' ? ' ↑' : ' ↓'}
+                                {sortColumn === 'name' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
                             </TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc' }}>Description</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc' }}>Actions</TableCell>
+                            <TableCell
+                                sx={{
+                                    fontWeight: 'bold',
+                                    border: '1px solid #ccc',
+                                    padding: '4px 8px',
+                                    cursor: 'pointer',
+                                }}
+                                onClick={() => handleSort('description')} // Sort by description
+                            >
+                                Description
+                                {sortColumn === 'description' && (sortDirection === 'asc' ? ' ↑' : ' ↓')}
+                            </TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '4px 8px' }}>
+                                Actions
+                            </TableCell>
                         </TableRow>
                     </TableHead>
+
                     <TableBody>
                         {items.map((item) => (
                             <TableRow key={item.stock_id}>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '2px 8px' }}>{item.stock_id}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '2px 8px' }}>{item.name}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '2px 8px' }}>{item.description || 'N/A'}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '2px 8px' }}>
-                                    <Button variant="outlined" color="primary" onClick={() => handleOpenDialog(item)} sx={{ marginRight: 1, padding: '2px 8px' }}>Edit</Button>
-                                    <Button variant="outlined" color="secondary" onClick={() => handleDelete(item.id)} sx={{ padding: '2px 8px' }}>Delete</Button>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>{item.stock_id}</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>{item.name}</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>{item.description || 'N/A'}</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>
+                                    <IconButton
+                                        color="primary"
+                                        onClick={() => handleOpenModal(item)}
+                                        aria-label="edit item"
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="secondary"
+                                        onClick={() => handleDelete(item.id)}
+                                        aria-label="delete item"
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}

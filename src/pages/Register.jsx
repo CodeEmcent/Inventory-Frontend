@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
     Box,
     Button,
@@ -77,6 +77,12 @@ const Register = () => {
                 <Button variant="contained" type="submit" fullWidth sx={{ backgroundColor: "#007bff" }}>
                     Register
                 </Button>
+                <Link
+                    to="/login"
+                    style={{ fontStyle: 'italic', fontSize: '12px' }} // Apply italic and reduce font size
+                >
+                    Already have an account? Login
+                </Link>
             </Box>
         </Container>
     );
