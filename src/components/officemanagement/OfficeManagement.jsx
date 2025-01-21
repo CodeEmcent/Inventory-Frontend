@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
+import AssignOffices from "./AssignOffices";
 import {
     Box,
     Button,
@@ -17,10 +18,16 @@ import {
     TextField,
     Typography,
     IconButton,
+    Select,
+    MenuItem,
+    FormControl,
+    InputLabel,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import API from "../../services/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -28,21 +35,24 @@ import "react-toastify/dist/ReactToastify.css";
 const OfficeManagement = () => {
     const [offices, setOffices] = useState([]);
     const [openModal, setOpenModal] = useState(false);
+    const [openAssignModal, setOpenAssignModal] = useState(false);
     const [formData, setFormData] = useState({ id: null, name: "", department: "" });
+    const [assignData, setAssignData] = useState({ staffId: "", officeId: "" });
     const [isEditing, setIsEditing] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [officeToDelete, setOfficeToDelete] = useState(null);
+    const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' }); // Sorting state
     const navigate = useNavigate();
 
     // Logout function
-    const logoutUser = () => {
+    const logoutUser = useCallback(() => {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         localStorage.removeItem("role");
-        navigate("/login"); // Redirect to the login page
-    };
+        navigate("/login");
+    }, [navigate]);
 
-    const fetchOffices = async () => {
+    const fetchOffices = useCallback(async () => {
         try {
             const response = await API.get("/api/offices/");
             setOffices(response.data);
@@ -51,12 +61,41 @@ const OfficeManagement = () => {
             if (error.response?.status === 401) logoutUser();
             else toast.error("Failed to fetch offices.");
         }
-    };
+    });
 
     useEffect(() => {
+        const fetchOffices = async () => {
+            try {
+                const response = await API.get("/api/offices/");
+                setOffices(response.data);
+            } catch (error) {
+                console.error("Error fetching offices:", error);
+                if (error.response?.status === 401) logoutUser();
+                else toast.error("Failed to fetch offices.");
+            }
+        };
+    
         console.log("OfficeManagement Component Mounted");
-        fetchOffices();  // Fetch offices when the component is mounted
-    }, []);
+        fetchOffices();
+    }, [logoutUser]);
+    
+
+    // Sorting function
+    const sortOffices = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+
+        const sortedOffices = [...offices].sort((a, b) => {
+            if (a[key] < b[key]) return direction === 'asc' ? -1 : 1;
+            if (a[key] > b[key]) return direction === 'asc' ? 1 : -1;
+            return 0;
+        });
+
+        setOffices(sortedOffices);
+        setSortConfig({ key, direction });
+    };
 
     // Handle opening the modal
     const handleOpenModal = (office = null) => {
@@ -127,16 +166,17 @@ const OfficeManagement = () => {
     return (
         <Box>
             <Typography
-            variant="h4"
-            gutterBottom
-            style={{
-                textAlign: 'center',           // Center alignment
-                textTransform: 'uppercase',    // Uppercase text
-                letterSpacing: '3px',          // Spaced out characters
-                fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
-                fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
-                fontWeight: 'bold',            // Bold font weight
-            }}
+                variant="h4"
+                gutterBottom
+                style={{
+                    textAlign: 'center',           // Center alignment
+                    textTransform: 'uppercase',    // Uppercase text
+                    letterSpacing: '3px',          // Spaced out characters
+                    fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
+                    fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
+                    fontWeight: 'bold',
+                    color: '#213d77',
+                }}
             >
                 Office Management
             </Typography>
@@ -149,6 +189,15 @@ const OfficeManagement = () => {
                 Add New Office
             </Button>
 
+            <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => setOpenAssignModal(true)} // Open AssignOffices modal
+                sx={{ marginBottom: 2, marginLeft: 2 }}
+            >
+                Assign Office to Staff< AssignOffices />
+            </Button>
+
             <TableContainer>
                 <Table sx={{ border: 1, borderColor: 'grey.300' }}>
                     <TableHead>
@@ -156,7 +205,7 @@ const OfficeManagement = () => {
                             sx={{
                                 borderBottom: 1,
                                 borderColor: 'grey.300',
-                                height: '40px', // Reduce header row height
+                                height: '40px',
                             }}
                         >
                             <TableCell
@@ -164,10 +213,17 @@ const OfficeManagement = () => {
                                     fontWeight: 'bold',
                                     borderRight: 1,
                                     borderColor: 'grey.300',
-                                    padding: '8px', // Reduce padding
+                                    padding: '8px',
+                                    cursor: 'pointer',
                                 }}
+                                onClick={() => sortOffices('name')}
                             >
                                 Name
+                                {sortConfig.key === 'name' && (
+                                    sortConfig.direction === 'asc' ?
+                                        <ArrowUpwardIcon fontSize="small" sx={{ marginLeft: 1 }} /> :
+                                        <ArrowDownwardIcon fontSize="small" sx={{ marginLeft: 1 }} />
+                                )}
                             </TableCell>
                             <TableCell
                                 sx={{
@@ -175,9 +231,16 @@ const OfficeManagement = () => {
                                     borderRight: 1,
                                     borderColor: 'grey.300',
                                     padding: '8px',
+                                    cursor: 'pointer',
                                 }}
+                                onClick={() => sortOffices('department')}
                             >
                                 Department
+                                {sortConfig.key === 'department' && (
+                                    sortConfig.direction === 'asc' ?
+                                        <ArrowUpwardIcon fontSize="small" sx={{ marginLeft: 1 }} /> :
+                                        <ArrowDownwardIcon fontSize="small" sx={{ marginLeft: 1 }} />
+                                )}
                             </TableCell>
                             <TableCell
                                 sx={{
@@ -235,26 +298,25 @@ const OfficeManagement = () => {
                                     }}
                                 >
                                     <IconButton
-                                            color="primary"
-                                            onClick={() => handleOpenModal(office)}
-                                            aria-label="edit office"
-                                        >
-                                            <EditIcon />
-                                        </IconButton>
-                                        <IconButton
-                                            color="secondary"
-                                            onClick={() => handleDeleteDialogOpen(office)}
-                                            aria-label="delete office"
-                                        >
-                                            <DeleteIcon />
-                                        </IconButton>
+                                        color="primary"
+                                        onClick={() => handleOpenModal(office)}
+                                        aria-label="edit office"
+                                    >
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton
+                                        color="secondary"
+                                        onClick={() => handleDeleteDialogOpen(office)}
+                                        aria-label="delete office"
+                                    >
+                                        <DeleteIcon />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-
 
             {/* Add/Edit Modal */}
             <Dialog open={openModal} onClose={handleCloseModal}>
@@ -286,6 +348,9 @@ const OfficeManagement = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* AssignOffices Modal */}
+            <AssignOffices open={openAssignModal} onClose={() => setOpenAssignModal(false)} />
 
             {/* Delete Confirmation Dialog */}
             <Dialog

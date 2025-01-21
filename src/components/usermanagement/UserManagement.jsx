@@ -189,9 +189,22 @@ const UserManagement = () => {
 
     return (
         <Box>
-            <Typography variant="h4" gutterBottom>
+            <Typography
+            variant="h4"
+            gutterBottom
+            style={{
+                textAlign: 'center',           // Center alignment
+                textTransform: 'uppercase',    // Uppercase text
+                letterSpacing: '3px',          // Spaced out characters
+                fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
+                fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
+                fontWeight: 'bold',
+                color: '#213d77',
+            }}
+            >
                 User Management
             </Typography>
+            <p>Basic Operations: Create New User, Edit Staff and Delete Staff</p>
             <Button
                 variant="contained"
                 color="primary"
