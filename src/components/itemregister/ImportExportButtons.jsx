@@ -7,7 +7,7 @@ const ImportExportButtons = () => {
 
     // Handle file download
     const handleDownload = (type) => {
-        window.location.href = `/api/registry/${type}`;
+        window.location.href = `/api/register/${type}`;
     };
 
     // Handle file upload (import)
@@ -16,7 +16,7 @@ const ImportExportButtons = () => {
         formData.append('file', event.target.files[0]);
 
         try {
-            await API.post('/api/registry/import', formData, {
+            await API.post('/api/register/import', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             alert('Import successful');
@@ -38,7 +38,7 @@ const ImportExportButtons = () => {
                 onClick={() => handleDownload('download')}
                 sx={{ marginRight: 2, textTransform: 'capitalize' }}
             >
-                Download Registry
+                Download Item Register
             </Button>
 
             <Button

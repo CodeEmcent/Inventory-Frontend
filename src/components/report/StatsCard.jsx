@@ -8,6 +8,7 @@ import {
     Button,
     Avatar,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import API from "../../services/api";
 
 const Dashboard = () => {
@@ -18,6 +19,8 @@ const Dashboard = () => {
         smallestItem: null,
         totalItems: 0,
     });
+
+    const navigate = useNavigate(); // Initialize useNavigate
 
     useEffect(() => {
         // Fetch user profile
@@ -61,13 +64,13 @@ const Dashboard = () => {
                 variant="h4"
                 gutterBottom
                 style={{
-                    textAlign: 'center',           // Center alignment
-                    textTransform: 'uppercase',    // Uppercase text
-                    letterSpacing: '3px',          // Spaced out characters
-                    fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
-                    fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
-                    fontWeight: 'bold',
-                    color: '#213d77',           // Bold font weight
+                    textAlign: "center",
+                    textTransform: "uppercase",
+                    letterSpacing: "3px",
+                    fontSize: "2.5rem",
+                    fontFamily: '"Roboto", sans-serif',
+                    fontWeight: "bold",
+                    color: "#213d77",
                 }}
             >
                 Inventory Summary
@@ -91,7 +94,7 @@ const Dashboard = () => {
                                 variant="outlined"
                                 size="small"
                                 sx={{ mt: 2 }}
-                                onClick={() => console.log("View Profile")}
+                                onClick={() => navigate("/api/users/profile")}
                             >
                                 View Profile
                             </Button>
@@ -111,7 +114,7 @@ const Dashboard = () => {
                                 variant="outlined"
                                 size="small"
                                 sx={{ mt: 2 }}
-                                onClick={() => console.log("View Offices")}
+                                onClick={() => navigate("/api/offices/")}
                             >
                                 View All
                             </Button>
@@ -136,7 +139,9 @@ const Dashboard = () => {
                                 variant="outlined"
                                 size="small"
                                 sx={{ mt: 2 }}
-                                onClick={() => console.log("View Item Details")}
+                                onClick={() =>
+                                    navigate(`/inventory/item/${inventoryStats.largestItem?.id}`)
+                                }
                             >
                                 View Details
                             </Button>
@@ -161,7 +166,9 @@ const Dashboard = () => {
                                 variant="outlined"
                                 size="small"
                                 sx={{ mt: 2 }}
-                                onClick={() => console.log("View Item Details")}
+                                onClick={() =>
+                                    navigate(`/inventory/item/${inventoryStats.smallestItem?.id}`)
+                                }
                             >
                                 View Details
                             </Button>

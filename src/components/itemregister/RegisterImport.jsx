@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import API from '../../services/api';
 
-const RegistryImport = () => {
+const RegisterImport = () => {
     const [file, setFile] = useState(null);
 
     // Handle file change
@@ -17,7 +17,7 @@ const RegistryImport = () => {
         formData.append('file', file);
 
         try {
-            const response = await API.post('/api/registry/import/', formData, {
+            const response = await API.post('/api/register/import/', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             console.log('File uploaded successfully:', response.data);
@@ -45,10 +45,10 @@ const RegistryImport = () => {
                 onClick={file ? handleUpload : handleFileInputClick} // If file is selected, submit; otherwise, open file input
                 style={{ padding: '12px' }} // Adjust padding here
             >
-                {file ? 'Submit' : 'Upload Registry'} {/* Change button text */}
+                {file ? 'Submit' : 'Upload Register'} {/* Change button text */}
             </button>
         </div>
     );
 };
 
-export default RegistryImport;
+export default RegisterImport;

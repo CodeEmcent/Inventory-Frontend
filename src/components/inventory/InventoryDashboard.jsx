@@ -63,7 +63,7 @@ const InventoryDashboard = () => {
             const [inventoryResponse, officesResponse, itemsResponse] = await Promise.all([
                 API.get("/api/inventory/"),
                 API.get("/api/offices/"),
-                API.get("/api/item-registry/"),
+                API.get("/api/item-register/"),
             ]);
 
             setInventory(inventoryResponse.data);

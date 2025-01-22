@@ -198,7 +198,7 @@ const Sidebar = ({ setCurrentSection, role }) => {
 
                             <ListItem
                                 button
-                                onClick={() => setCurrentSection("itemRegistry")}
+                                onClick={() => setCurrentSection("itemRegister")}
                                 sx={{
                                     "&:hover": { backgroundColor: "#FFF", color: "#2151a2" },
                                     color: "#FFFFFF",
@@ -208,7 +208,7 @@ const Sidebar = ({ setCurrentSection, role }) => {
                                 <ListItemIcon>
                                     <InventoryIcon sx={{ color: "#FFFFFF" }} />
                                 </ListItemIcon>
-                                <ListItemText primary="Item Registry" />
+                                <ListItemText primary="Item Register" />
                             </ListItem>
 
                             <ListItem
