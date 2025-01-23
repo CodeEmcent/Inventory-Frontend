@@ -4,7 +4,7 @@ import WarningIcon from '@mui/icons-material/Warning';
 import API from '../../services/api';
 import { useNavigate } from "react-router-dom";
 import ImportExportButtons from './ImportExportButtons';
-import RegisterImport from './RegisterImport';
+import RegisterImport from './RegisterImport';  // Import RegisterImport component
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -143,12 +143,35 @@ const ItemRegister = () => {
 
     return (
         <Box>
-            <Typography variant="h4" gutterBottom>Item Register</Typography>
+            <Typography
+                variant="h4"
+                gutterBottom
+                style={{
+                    textAlign: 'center',           
+                    textTransform: 'uppercase',    
+                    letterSpacing: '3px',          
+                    fontSize: '2.5rem',            
+                    fontFamily: '"Roboto", sans-serif', 
+                    fontWeight: 'bold',
+                    color: '#213d77',
+                }}
+            >
+                Item Register
+            </Typography>
 
-            <Stack direction="row" spacing={2} sx={{ marginBottom: 2 }}>
-                <Button variant="contained" color="primary" onClick={() => handleOpenDialog()} sx={{ textTransform: 'capitalize' }}>Add New Item</Button>
+            <Stack
+                direction="row"
+                spacing={2}
+                sx={{
+                    marginBottom: 2,
+                    justifyContent: 'center', // Center buttons horizontally
+                    alignItems: 'center', // Center buttons vertically (optional)
+                    width: '100%',
+                }}
+            >
+                <Button variant="contained" color="success" onClick={() => handleOpenDialog()} sx={{ textTransform: 'capitalize' }}>Add New Item</Button>
                 <ImportExportButtons />
-                <RegisterImport />
+                <RegisterImport fetchItems={fetchItems} /> {/* Pass fetchItems as prop */}
             </Stack>
 
             {message && <Typography color="primary">{message}</Typography>}
@@ -185,7 +208,6 @@ const ItemRegister = () => {
                 </Table>
             </TableContainer>
 
-            {/* Styled Confirmation Dialog */}
             <Dialog open={openDeleteDialog} onClose={handleDeleteCancel} sx={{ padding: 2 }}>
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', fontWeight: 'bold', fontSize: '1.25rem', color: 'red' }}>
                     <WarningIcon sx={{ color: 'red', marginRight: 2 }} />
@@ -209,7 +231,6 @@ const ItemRegister = () => {
                 </DialogActions>
             </Dialog>
 
-            {/* Item Dialog for Add/Edit */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>{isEditing ? 'Edit Item' : 'Add Item'}</DialogTitle>
                 <DialogContent>
@@ -223,6 +244,8 @@ const ItemRegister = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            <ToastContainer />
         </Box>
     );
 };

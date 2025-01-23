@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import API from '../../services/api';
+import { toast } from "react-toastify";
 
-const RegisterImport = () => {
+const RegisterImport = ({ fetchItems }) => {
     const [file, setFile] = useState(null);
 
     // Handle file change
@@ -20,9 +21,14 @@ const RegisterImport = () => {
             const response = await API.post('/api/register/import/', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-            console.log('File uploaded successfully:', response.data);
+
+            if (response.status === 200) {
+                toast.success("File uploaded successfully!"); // Show success toast
+                fetchItems(); // Call fetchItems to refresh the list in the parent component
+            }
         } catch (error) {
             console.error('Error uploading file:', error);
+            toast.error("Error uploading file. Please try again."); // Show error toast
         }
     };
 
@@ -43,7 +49,12 @@ const RegisterImport = () => {
             {/* Upload/Submit Button */}
             <button
                 onClick={file ? handleUpload : handleFileInputClick} // If file is selected, submit; otherwise, open file input
-                style={{ padding: '12px' }} // Adjust padding here
+                style={{
+                    padding: '12px',
+                    backgroundColor: file ? 'green' : '#D99B3A', // Soft amber color for the non-selected state
+                    border: 'none', // Optional: Remove border for a cleaner look
+                    color: 'white', // Text color for contrast
+                }}
             >
                 {file ? 'Submit' : 'Upload Register'} {/* Change button text */}
             </button>
