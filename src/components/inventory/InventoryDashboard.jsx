@@ -23,7 +23,7 @@ import {
     Tooltip,
     CircularProgress,
 } from "@mui/material";
-import { Add, Edit, Delete, Sort } from "@mui/icons-material";
+import { Add, Edit, Delete, Sort, ArrowBack, ArrowForward } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -51,6 +51,12 @@ const InventoryDashboard = () => {
     const [filterCriteria, setFilterCriteria] = useState({ office: "", item: "" });
     const [sortOrder, setSortOrder] = useState({ column: "", direction: "asc" });
     const navigate = useNavigate();
+    const [pagination, setPagination] = useState({
+        next: null,
+        previous: null,
+        count: 0,
+        currentPage: 1,
+    });
 
     const logoutUser = useCallback(() => {
         localStorage.removeItem("accessToken");
@@ -58,10 +64,10 @@ const InventoryDashboard = () => {
         navigate("/login");
     }, [navigate]);
 
-    const fetchData = useCallback(async () => {
+    const fetchData = useCallback(async (page = 1) => {
         try {
             const [inventoryResponse, officesResponse, itemsResponse] = await Promise.all([
-                API.get("/api/inventory/"),
+                API.get(`/api/inventory/?page=${page}`),
                 API.get("/api/offices/"),
                 API.get("/api/item-register/"),
             ]);
@@ -69,9 +75,16 @@ const InventoryDashboard = () => {
             // Log the fetched inventory data
             console.log('Fetched Inventory:', inventoryResponse.data);
 
-            setInventory(inventoryResponse.data);
-            setFilteredInventory(inventoryResponse.data);
+            setInventory(inventoryResponse.data.results || []);
+            setFilteredInventory(inventoryResponse.data.results || []);
             setOffices(officesResponse.data);
+
+            setPagination({
+                next: inventoryResponse.data.next,
+                previous: inventoryResponse.data.previous,
+                count: inventoryResponse.data.count,
+                currentPage: page,
+            });
 
             const items = Array.isArray(itemsResponse.data.item_register)
                 ? itemsResponse.data.item_register
@@ -447,6 +460,28 @@ const InventoryDashboard = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            {/* Pagination Controls */}
+            <Box display="flex" justifyContent="space-between" mt={2}>
+                <Button
+                    onClick={() => fetchData(pagination.currentPage - 1)}
+                    disabled={!pagination.previous}
+                    variant="contained"
+                    color="primary"
+                >
+                    <ArrowBack /> Previous
+                </Button>
+                <Typography>
+                    Page {pagination.currentPage} of {Math.ceil(pagination.count / 10)}
+                </Typography>
+                <Button
+                    onClick={() => fetchData(pagination.currentPage + 1)}
+                    disabled={!pagination.next}
+                    variant="contained"
+                    color="primary"
+                >
+                    Next <ArrowForward />
+                </Button>
+            </Box>
         </Box>
     );
 };
