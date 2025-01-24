@@ -20,8 +20,10 @@ import {
     TableChart,
 } from "@mui/icons-material";
 import API from "../../services/api";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import styles
 
-const InventoryTools = () => {
+const InventoryTools = ({ fetchData }) => {
     const [offices, setOffices] = useState([]);
     const [selectedOffice, setSelectedOffice] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
@@ -105,7 +107,7 @@ const InventoryTools = () => {
 
     const handleImport = async () => {
         if (!selectedOffice || !selectedFile) {
-            alert("Please select an office and a file.");
+            toast.error("Please select an office and a file."); // Replace alert with toast
             return;
         }
 
@@ -113,18 +115,28 @@ const InventoryTools = () => {
         formData.append("file", selectedFile);
 
         try {
-            setIsLoading(true);
+            setIsLoading(true); // Start loading indicator
             await API.post(`/api/import/?office_id=${selectedOffice}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            alert("Inventory imported successfully.");
+            toast.success("Inventory imported successfully!"); // Success toast
+            // Trigger data refresh in InventoryDashboard
+            if (fetchData) fetchData();
         } catch (error) {
             console.error("Error importing inventory:", error);
-            alert("Error importing inventory. Please check the file format.");
+
+            // Extract error message from response if available
+            const errorMessage =
+                error.response?.data?.message ||
+                error.response?.data?.error ||
+                "An error occurred while importing the inventory.";
+
+            toast.error(errorMessage); // Error toast with details
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Stop loading indicator
         }
     };
+
 
     const handleExport = async () => {
         if (!selectedOffice) {
@@ -178,6 +190,7 @@ const InventoryTools = () => {
 
     return (
         <Box>
+            <ToastContainer position="top-right" autoClose={3000} />
             <Typography
                 variant="subtitle2"
                 gutterBottom
@@ -257,7 +270,7 @@ const InventoryTools = () => {
                         height: "40px",
                     }}
                 >
-                    Upload
+                    {isLoading ? <CircularProgress size={20} color="inherit" /> : "Upload"}
                 </Button>
                 <Button
                     variant="contained"

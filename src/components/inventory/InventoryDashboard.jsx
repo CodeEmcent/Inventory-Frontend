@@ -230,7 +230,7 @@ const InventoryDashboard = () => {
             </Typography>
 
             <Grid container spacing={2} alignItems="center" justifyContent="center" sx={{ mb: 4 }}>
-                <InventoryTools />
+                <InventoryTools fetchData={fetchData} />
             </Grid>
 
             <Grid container spacing={2} sx={{ marginBottom: 2 }}>
