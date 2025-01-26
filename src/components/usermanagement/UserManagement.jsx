@@ -160,7 +160,7 @@ const UserManagement = () => {
             toast.error("Failed to submit user data.");
         }
     };
-    
+
 
     // Open delete confirmation dialog
     const handleDeleteDialogOpen = (user) => {
@@ -190,17 +190,17 @@ const UserManagement = () => {
     return (
         <Box>
             <Typography
-            variant="h4"
-            gutterBottom
-            style={{
-                textAlign: 'center',           // Center alignment
-                textTransform: 'uppercase',    // Uppercase text
-                letterSpacing: '3px',          // Spaced out characters
-                fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
-                fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
-                fontWeight: 'bold',
-                color: '#213d77',
-            }}
+                variant="h4"
+                gutterBottom
+                style={{
+                    textAlign: 'center',           // Center alignment
+                    textTransform: 'uppercase',    // Uppercase text
+                    letterSpacing: '3px',          // Spaced out characters
+                    fontSize: '2.5rem',            // Adjusted font size (you can tweak this value as needed)
+                    fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
+                    fontWeight: 'bold',
+                    color: '#213d77',
+                }}
             >
                 User Management
             </Typography>
@@ -214,29 +214,31 @@ const UserManagement = () => {
                 Add New User
             </Button>
 
-            <TableContainer>
+            <TableContainer sx={{ border: '1px solid #ccc' }}>
                 <Table sx={{ border: 1, borderColor: 'grey.300' }}>
                     <TableHead>
-                        <TableRow sx={{ borderBottom: 1, borderColor: 'grey.300' }}>
-                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                        <TableRow sx={{
+                            backgroundColor: '#e0e0e0',
+                        }}>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>
                                 Username
                             </TableCell>
-                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>
                                 First Name
                             </TableCell>
-                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>
                                 Last Name
                             </TableCell>
-                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>
                                 Email
                             </TableCell>
-                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>
                                 Role
                             </TableCell>
-                            <TableCell sx={{ borderRight: 1, borderColor: 'grey.300', fontWeight: 'bold' }}>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>
                                 Assigned Offices
                             </TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -412,8 +414,8 @@ const UserManagement = () => {
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText id="delete-dialog-description" sx={{ fontSize: "1rem" }}>
-                    Are you sure you want to delete user{" "}
-                    <strong>{userToDelete?.username}</strong>? This action cannot be undone.
+                        Are you sure you want to delete user{" "}
+                        <strong>{userToDelete?.username}</strong>? This action cannot be undone.
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions sx={{ justifyContent: "center" }}>

@@ -10,6 +10,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Sort } from "@mui/icons-material";
 
 const ItemRegister = () => {
     const [items, setItems] = useState([]);
@@ -154,6 +155,7 @@ const ItemRegister = () => {
                     fontFamily: '"Roboto", sans-serif', 
                     fontWeight: 'bold',
                     color: '#213d77',
+                    marginBottom: '40px',
                 }}
             >
                 Item Register
@@ -180,21 +182,23 @@ const ItemRegister = () => {
             <TableContainer sx={{ border: '1px solid #ccc' }}>
                 <Table sx={{ borderCollapse: 'collapse', width: '100%' }}>
                     <TableHead>
-                        <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '4px 8px' }}>Item ID</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '4px 8px', cursor: 'pointer' }} onClick={() => handleSort('name')}>Name</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '4px 8px', cursor: 'pointer' }} onClick={() => handleSort('description')}>Description</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '4px 8px' }}>Actions</TableCell>
+                        <TableRow sx={{
+                            backgroundColor: '#e0e0e0',
+                        }}>
+                            <TableCell sx={{ fontWeight: 'bold', padding: '8px 12px', border: '1px solid #ccc' }}>Item ID</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', padding: '8px 12px', border: '1px solid #ccc', cursor: 'pointer' }} onClick={() => handleSort('name')}>Name <Sort fontSize="small" /></TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', padding: '8px 12px', border: '1px solid #ccc', cursor: 'pointer' }} onClick={() => handleSort('description')}>Description <Sort fontSize="small" /></TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', padding: '8px 12px', border: '1px solid #ccc' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
 
                     <TableBody>
                         {items.map((item) => (
                             <TableRow key={item.item_id}>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>{item.item_id}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>{item.name}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>{item.description || 'N/A'}</TableCell>
-                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px' }}>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px', height: '5px' }}>{item.item_id}</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px', height: '5px' }}>{item.name}</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px', height: '5px' }}>{item.description || 'N/A'}</TableCell>
+                                <TableCell sx={{ border: '1px solid #ccc', padding: '0 8px', height: '5px' }}>
                                     <IconButton color="primary" onClick={() => handleOpenDialog(item)} aria-label="edit item">
                                         <EditIcon />
                                     </IconButton>

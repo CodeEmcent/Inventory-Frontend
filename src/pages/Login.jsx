@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import { useAuth } from "../contexts/AuthContext";  // Import the useAuth hook
-import { jwtDecode } from 'jwt-decode';  // Correct import for jwt-decode
+import { jwtDecode } from "jwt-decode"; // Correct import
 import {
     Box,
     Button,
@@ -17,14 +16,17 @@ const Login = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    const { login } = useAuth(); // Access the login function from AuthContext
+
+    const handleInputChange = (setter) => (e) => {
+        setter(e.target.value);
+        setError(""); // Clear error on input change
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post("http://127.0.0.1:8000/api/token/", {
-                username: email,  // Send email as the username
-                email: email,     // Send email explicitly as email
+                username: email,
                 password,
             });
 
@@ -34,25 +36,29 @@ const Login = () => {
             localStorage.setItem("refreshToken", response.data.refresh);
 
             // Decode the JWT token to extract the role
-            const decodedToken = jwtDecode(accessToken);  // Use the correct function name
-            console.log("Decoded Token:", decodedToken);
+            const decodedToken = jwtDecode(accessToken);
+            console.log("Decoded Role:", decodedToken.role);
             const role = decodedToken.role;
-
             // Save the user role in localStorage
             localStorage.setItem("role", role);
 
             // Redirect based on the user role
             if (role === "super_admin") {
                 navigate("/admin-dashboard");
+                console.log("User is a super admin");
             } else if (role === "staff") {
                 navigate("/staff-dashboard");
+                console.log("User is a staff member");
             } else {
                 setError("Unauthorized role.");
+                console.error("Unknown role:", role);
             }
-
         } catch (err) {
-            console.error("Login error: ", err);
-            setError("Invalid credentials. Please try again.");
+            if (err.response && err.response.status === 401) {
+                setError("Invalid email or password.");
+            } else {
+                setError("An unexpected error occurred. Please try again.");
+            }
         }
     };
 
@@ -62,7 +68,7 @@ const Login = () => {
                 component="form"
                 onSubmit={handleSubmit}
                 sx={{
-                    mt: 11.2,
+                    mt: 10,
                     p: 4,
                     display: "flex",
                     flexDirection: "column",
@@ -80,7 +86,7 @@ const Login = () => {
                     label="Email"
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleInputChange(setEmail)}
                     fullWidth
                     required
                 />
@@ -88,7 +94,7 @@ const Login = () => {
                     label="Password"
                     type="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handleInputChange(setPassword)}
                     fullWidth
                     required
                 />
@@ -97,7 +103,7 @@ const Login = () => {
                 </Button>
                 <Link
                     to="/register"
-                    style={{ fontStyle: 'italic', fontSize: '12px' }} // Apply italic and reduce font size
+                    style={{ fontStyle: "italic", fontSize: "12px" }}
                 >
                     Don't have an account? Register
                 </Link>

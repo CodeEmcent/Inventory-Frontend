@@ -89,12 +89,6 @@ const Sidebar = ({ setCurrentSection, role }) => {
 
                 <Divider sx={{ backgroundColor: "#2151a2", height: 30, }} />
 
-                {/* Second Divider */}
-                <Divider sx={{ backgroundColor: "#fff", height: 2, }} />
-
-                {/* Third Divider */}
-                <Divider sx={{ backgroundColor: "#2151a2", height: 30, mb: 2 }} />
-
                 {/* Logout Button with Icon and Hover Effect */}
                 <ListItem
                     button
@@ -138,15 +132,13 @@ const Sidebar = ({ setCurrentSection, role }) => {
                         />
                     )}
                 </ListItem>
-
-
-            </Drawer >
+            </Drawer>
 
             {/* Logout Confirmation Dialog */}
-            < LogoutDialog open={logoutDialogOpen} onClose={handleDialogClose} onConfirm={handleConfirmLogout} />
+            <LogoutDialog open={logoutDialogOpen} onClose={handleDialogClose} onConfirm={handleConfirmLogout} />
 
             {/* Toast Notifications */}
-            < ToastContainer position="top-center" autoClose={3000} />
+            <ToastContainer position="top-center" autoClose={3000} />
         </>
     );
 };

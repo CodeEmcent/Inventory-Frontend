@@ -4,7 +4,7 @@ import { Box, Typography, AppBar, Toolbar } from "@mui/material";
 
 const Header = ({ dashboardName, welcomeMessage }) => {
     return (
-        <AppBar position="static" sx={{ backgroundColor: "#213d77", color: "#FFFFFF" }}>
+        <AppBar position="static" sx={{ backgroundColor: "#213d77", color: "#FFFFFF", height: "60px" }}>
             <Toolbar>
                 {/* Welcome Note */}
                 <Typography variant="h6" sx={{ flexGrow: 1, textAlign: "left" }}>

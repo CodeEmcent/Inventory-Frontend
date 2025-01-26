@@ -74,11 +74,11 @@ const OfficeManagement = () => {
                 else toast.error("Failed to fetch offices.");
             }
         };
-    
+
         console.log("OfficeManagement Component Mounted");
         fetchOffices();
     }, [logoutUser]);
-    
+
 
     // Sorting function
     const sortOffices = (key) => {
@@ -176,29 +176,45 @@ const OfficeManagement = () => {
                     fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
                     fontWeight: 'bold',
                     color: '#213d77',
+                    marginBottom: '30px',
                 }}
             >
                 Office Management
             </Typography>
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handleOpenModal()}
-                sx={{ marginBottom: 2 }}
-            >
-                Add New Office
-            </Button>
+            <Box sx={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
 
-            <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => setOpenAssignModal(true)} // Open AssignOffices modal
-                sx={{ marginBottom: 2, marginLeft: 2 }}
-            >
-                Assign Office to Staff< AssignOffices />
-            </Button>
 
-            <TableContainer>
+                {/* Left-aligned Button */}
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleOpenModal()}
+                    sx={{
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                        paddingX: 3,
+                        height: "36px", // Consistent button height
+                    }}
+                >
+                    Add New Office
+                </Button>
+
+                <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => setOpenAssignModal(true)} // Open AssignOffices modal
+                    sx={{
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
+                        paddingX: 3,
+                        height: "36px", // Consistent button height
+                    }}
+                >
+                    Assign Office to Staff< AssignOffices />
+                </Button>
+            </Box>
+
+            <TableContainer sx={{ border: '1px solid #ccc' }}>
                 <Table sx={{ border: 1, borderColor: 'grey.300' }}>
                     <TableHead>
                         <TableRow
@@ -206,16 +222,11 @@ const OfficeManagement = () => {
                                 borderBottom: 1,
                                 borderColor: 'grey.300',
                                 height: '40px',
+                                backgroundColor: '#e0e0e0',
                             }}
                         >
                             <TableCell
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: 1,
-                                    borderColor: 'grey.300',
-                                    padding: '8px',
-                                    cursor: 'pointer',
-                                }}
+                                sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}
                                 onClick={() => sortOffices('name')}
                             >
                                 Name
@@ -226,13 +237,7 @@ const OfficeManagement = () => {
                                 )}
                             </TableCell>
                             <TableCell
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: 1,
-                                    borderColor: 'grey.300',
-                                    padding: '8px',
-                                    cursor: 'pointer',
-                                }}
+                                sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}
                                 onClick={() => sortOffices('department')}
                             >
                                 Department
@@ -243,16 +248,11 @@ const OfficeManagement = () => {
                                 )}
                             </TableCell>
                             <TableCell
-                                sx={{
-                                    fontWeight: 'bold',
-                                    borderRight: 1,
-                                    borderColor: 'grey.300',
-                                    padding: '8px',
-                                }}
+                                sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}
                             >
                                 Created At
                             </TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', padding: '8px' }}>Actions</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', border: '1px solid #ccc', padding: '8px 12px', border: '1px solid #ccc' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

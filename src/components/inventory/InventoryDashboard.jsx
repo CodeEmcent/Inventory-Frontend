@@ -24,13 +24,15 @@ import {
     CircularProgress,
 } from "@mui/material";
 import { Add, Edit, Delete, Sort, ArrowBack, ArrowForward } from "@mui/icons-material";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import { DialogContentText } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import API from "../../services/api";
 import InventoryTools from "./InventoryTools";
 
-const InventoryDashboard = () => {
+const InventoryDashboard = ({ role }) => {
     const [inventory, setInventory] = useState([]);
     const [filteredInventory, setFilteredInventory] = useState([]);
     const [offices, setOffices] = useState([]);
@@ -65,19 +67,50 @@ const InventoryDashboard = () => {
     }, [navigate]);
 
     const fetchData = useCallback(async (page = 1) => {
+        const token = localStorage.getItem("accessToken");
+        if (!token) {
+            logoutUser();
+            return;
+        }
+
         try {
+            // Fetch user profile to get assigned offices
+            const staffProfileResponse = await API.get("/api/users/profile", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const assignedOffices = staffProfileResponse.data.assigned_offices || [];
+
+            // If the user is a staff member, filter inventory and items by assigned offices
+            // const officeFilter = assignedOffices.length > 0 ? `&office_id=${assignedOffices.join(",")}` : "";
+            const officeFilter = role === "staff" && assignedOffices.length
+                ? `&office_id=${assignedOffices.join(",")}`
+                : "";
+
+            // Fetch inventory, offices, and items
             const [inventoryResponse, officesResponse, itemsResponse] = await Promise.all([
-                API.get(`/api/inventory/?page=${page}`),
-                API.get("/api/offices/"),
-                API.get("/api/item-register/"),
+                API.get(`/api/inventory/?page=${page}${officeFilter}`, {
+                    headers: { Authorization: `Bearer ${token}` },
+                }),
+                API.get("/api/offices/", {
+                    headers: { Authorization: `Bearer ${token}` },
+                }),
+                API.get("/api/item-register/", {
+                    headers: { Authorization: `Bearer ${token}` },
+                }),
             ]);
 
-            // Log the fetched inventory data
-            console.log('Fetched Inventory:', inventoryResponse.data);
+            console.log("Fetched Inventory:", inventoryResponse.data);
+
+            // Filter offices based on assigned offices if user is staff
+            const filteredOffices = assignedOffices.length
+                ? officesResponse.data.filter((office) => assignedOffices.includes(office.id))
+                : officesResponse.data;
 
             setInventory(inventoryResponse.data.results || []);
             setFilteredInventory(inventoryResponse.data.results || []);
-            setOffices(officesResponse.data);
+            setOffices(filteredOffices); // Set filtered offices
+            setItems(itemsResponse.data.item_register || []); // Set items for all users
 
             setPagination({
                 next: inventoryResponse.data.next,
@@ -85,11 +118,6 @@ const InventoryDashboard = () => {
                 count: inventoryResponse.data.count,
                 currentPage: page,
             });
-
-            const items = Array.isArray(itemsResponse.data.item_register)
-                ? itemsResponse.data.item_register
-                : [];
-            setItems(items);
         } catch (error) {
             console.error("Error fetching data:", error);
             toast.error("Error fetching data. Please try again.");
@@ -98,6 +126,7 @@ const InventoryDashboard = () => {
             }
         }
     }, [logoutUser]);
+
 
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
@@ -193,17 +222,47 @@ const InventoryDashboard = () => {
         setDeleteId(null);
     };
 
+    // const handleSubmit = async () => {
+    //     const { office_id, item_id, quantity, remarks, id } = formData;
+    //     try {
+    //         if (isEditing) {
+    //             await API.put(`/api/inventory/${id}/`, { office_id, item_id, quantity, remarks });
+    //             toast.success("Inventory item updated successfully.");
+    //         } else {
+    //             await API.post("/api/inventory/", { office_id, item_id, quantity, remarks });
+    //             toast.success("Inventory item created successfully.");
+    //         }
+    //         fetchData(); // Re-fetch the filtered data
+    //         handleCloseModal();
+    //     } catch (error) {
+    //         console.error("Error submitting inventory item:", error.response?.data || error.message);
+    //         toast.error(error.response?.data?.message || "An error occurred while submitting the item.");
+    //     }
+    // };
+
     const handleSubmit = async () => {
         const { office_id, item_id, quantity, remarks, id } = formData;
+
+        // Make sure item_id is the string identifier from the item register
+        const selectedItem = items.find(item => item.id === item_id);
+        const payload = {
+            office_id,
+            item_id: selectedItem ? selectedItem.item_id : item_id,  // Ensure item_id is the string (like "OLASS-97F14205")
+            quantity,
+            remarks,
+        };
+
+        console.log("Submitting Data:", payload); // Debug log to check the payload
+
         try {
             if (isEditing) {
-                await API.put(`/api/inventory/${id}/`, { office_id, item_id, quantity, remarks });
+                await API.put(`/api/inventory/${id}/`, payload);
                 toast.success("Inventory item updated successfully.");
             } else {
-                await API.post("/api/inventory/", { office_id, item_id, quantity, remarks });
+                await API.post("/api/inventory/", payload);
                 toast.success("Inventory item created successfully.");
             }
-            fetchData();
+            fetchData(); // Re-fetch the filtered data
             handleCloseModal();
         } catch (error) {
             console.error("Error submitting inventory item:", error.response?.data || error.message);
@@ -237,35 +296,48 @@ const InventoryDashboard = () => {
                     fontSize: "2.5rem",
                     fontFamily: '"Roboto", sans-serif',
                     fontWeight: "bold",
+                    color: "#213d77",
                 }}
             >
                 Inventory Dashboard
             </Typography>
 
             <Grid container spacing={2} alignItems="center" justifyContent="center" sx={{ mb: 4 }}>
-                <InventoryTools fetchData={fetchData} />
+                <InventoryTools role={role} fetchData={fetchData} />
             </Grid>
 
-            <Grid container spacing={2} sx={{ marginBottom: 2 }}>
-                <Grid item xs={12} sm={4}>
+            <Grid container
+                alignItems="center"
+                justifyContent="space-between" // Spread items: Add button on the left, filters on the right
+                spacing={2}
+                sx={{ marginBottom: 2 }}>
+                {/* Add Button */}
+                <Grid item>
                     <Button
                         variant="contained"
                         color="primary"
-                        fullWidth
                         startIcon={<Add />}
+                        size="small" // Reduce button size
+                        sx={{
+                            height: "40px", // Uniform height for buttons
+                            textTransform: "uppercase",
+                            fontWeight: "bold",
+                            paddingX: 2,
+                        }}
                         onClick={() => handleOpenModal()}
                     >
                         Add Item
                     </Button>
                 </Grid>
-                <Grid item xs={6} sm={3}>
-                    <FormControl fullWidth>
+
+                {/* Filters */}
+                <Grid item sx={{ display: "flex", gap: 2 }}>
+                    <FormControl size="small" sx={{ minWidth: 150 }}>
                         <InputLabel>Filter by Office</InputLabel>
                         <Select
                             name="office"
                             value={filterCriteria.office}
                             onChange={(e) => {
-
                                 console.log("Selected Office ID:", e.target.value);
                                 setFilterCriteria({ ...filterCriteria, office: e.target.value })
                             }
@@ -279,9 +351,8 @@ const InventoryDashboard = () => {
                             ))}
                         </Select>
                     </FormControl>
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                    <FormControl fullWidth>
+
+                    <FormControl size="small" sx={{ minWidth: 150 }}>
                         <InputLabel>Filter by Item</InputLabel>
                         <Select
                             name="item"
@@ -301,7 +372,7 @@ const InventoryDashboard = () => {
                 </Grid>
             </Grid>
 
-            <TableContainer>
+            <TableContainer sx={{ border: '1px solid #ccc' }}>
                 <Table sx={{
                     borderCollapse: 'collapse',
                     width: '100%',
@@ -400,16 +471,17 @@ const InventoryDashboard = () => {
                                     name="item_id"
                                     value={formData.item_id}
                                     onChange={(e) =>
-                                        setFormData({ ...formData, item_id: e.target.value })
+                                        setFormData({ ...formData, item_id: e.target.value }) // Ensure you're using the correct item_id (string)
                                     }
                                 >
                                     {items.map((item) => (
-                                        <MenuItem key={item.id} value={item.id}>
+                                        <MenuItem key={item.id} value={item.item_id}> {/* Use item.item_id as the value */}
                                             {item.name}
                                         </MenuItem>
                                     ))}
                                 </Select>
                             </FormControl>
+
                             <TextField
                                 name="quantity"
                                 label="Quantity"
@@ -446,20 +518,41 @@ const InventoryDashboard = () => {
             </Dialog>
 
             {/* Confirmation Dialog */}
-            <Dialog open={openConfirmDialog} onClose={handleCancelDelete}>
-                <DialogTitle>Confirm Deletion</DialogTitle>
+            <Dialog 
+                open={openConfirmDialog} 
+                onClose={handleCancelDelete} 
+                aria-labelledby="delete-dialog-title"
+                aria-describedby="delete-dialog-description"
+                sx={{
+                    "& .MuiDialog-paper": {
+                        borderRadius: 2,
+                        padding: 2,
+                        maxWidth: "400px",
+                        margin: "auto",
+                        textAlign: "center",
+                    },
+                }}>
+                <DialogTitle id="delete-dialog-title" sx={{ fontWeight: "bold", color: "red" }}>
+                    <Box display="flex" alignItems="center" justifyContent="center">
+                        <WarningAmberIcon fontSize="large" sx={{ color: "orange", marginRight: 1 }} />
+                        Confirm Deletion
+                    </Box>
+                </DialogTitle>
                 <DialogContent>
-                    <Typography>Are you sure you want to delete this item?</Typography>
+                    <DialogContentText id="delete-dialog-description" sx={{ fontSize: "1rem" }}>
+                        Are you sure you want to delete this item? This action cannot be undone.
+                    </DialogContentText>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleCancelDelete} color="secondary">
+                <DialogActions sx={{ justifyContent: "center" }}>
+                    <Button onClick={handleCancelDelete} variant="outlined" color="primary" sx={{ cursor: "pointer" }}>
                         Cancel
                     </Button>
-                    <Button onClick={handleDelete} color="error">
+                    <Button onClick={handleDelete} variant="contained" color="error" sx={{ cursor: "pointer" }}>
                         Delete
                     </Button>
                 </DialogActions>
             </Dialog>
+
             {/* Pagination Controls */}
             <Box display="flex" justifyContent="space-between" mt={2}>
                 <Button

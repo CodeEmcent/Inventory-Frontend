@@ -22,8 +22,9 @@ import {
 import API from "../../services/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import styles
+import { red } from "@mui/material/colors";
 
-const InventoryTools = ({ fetchData }) => {
+const InventoryTools = ({ fetchData, role }) => {
     const [offices, setOffices] = useState([]);
     const [selectedOffice, setSelectedOffice] = useState("");
     const [selectedFile, setSelectedFile] = useState(null);
@@ -44,13 +45,18 @@ const InventoryTools = ({ fetchData }) => {
         const fetchOffices = async () => {
             try {
                 const response = await API.get("/api/offices/");
+                if (response.data.length === 0) {
+                    toast.info("No offices assigned to you.");
+                }
                 setOffices(response.data);
             } catch (error) {
                 console.error("Error fetching offices:", error);
+                toast.error("Failed to fetch offices.");
             }
         };
         fetchOffices();
     }, []);
+
 
     // Open modal for adding or editing inventory
     const handleOpenModal = (inventoryItem = null) => {
@@ -107,7 +113,7 @@ const InventoryTools = ({ fetchData }) => {
 
     const handleImport = async () => {
         if (!selectedOffice || !selectedFile) {
-            toast.error("Please select an office and a file."); // Replace alert with toast
+            toast.error("Please select an office and a file.");
             return;
         }
 
@@ -115,28 +121,23 @@ const InventoryTools = ({ fetchData }) => {
         formData.append("file", selectedFile);
 
         try {
-            setIsLoading(true); // Start loading indicator
+            setIsLoading(true);
             await API.post(`/api/import/?office_id=${selectedOffice}`, formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            toast.success("Inventory imported successfully!"); // Success toast
-            // Trigger data refresh in InventoryDashboard
+            toast.success("Inventory imported successfully!");
             if (fetchData) fetchData();
         } catch (error) {
             console.error("Error importing inventory:", error);
-
-            // Extract error message from response if available
             const errorMessage =
                 error.response?.data?.message ||
                 error.response?.data?.error ||
                 "An error occurred while importing the inventory.";
-
-            toast.error(errorMessage); // Error toast with details
+            toast.error(errorMessage);
         } finally {
-            setIsLoading(false); // Stop loading indicator
+            setIsLoading(false);
         }
     };
-
 
     const handleExport = async () => {
         if (!selectedOffice) {
@@ -195,125 +196,139 @@ const InventoryTools = ({ fetchData }) => {
                 variant="subtitle2"
                 gutterBottom
                 style={{
-                    textAlign: 'center',           // Center alignment
-                    textTransform: 'capitalize',    // Uppercase text
-                    letterSpacing: '3px',          // Spaced out characters
-                    fontSize: '1rem',            // Adjusted font size (you can tweak this value as needed)
-                    fontFamily: '"Roboto", sans-serif', // Custom font (Roboto is just an example)
-                    fontWeight: 'bold',
-                    fontStyle: 'italic',           // Bold font weight
-                    marginTop: '50px',
+                    textAlign: "center",
+                    textTransform: "capitalize",
+                    fontSize: "1rem",
+                    fontFamily: '"Roboto", sans-serif',
+                    fontWeight: "bold",
+                    fontStyle: "italic",
+                    marginBottom: "16px",
+                    marginTop: "50px",
+                    color: '#d32f2f',
                 }}
             >
-                Manage Inventory
+                Manage Your Office Inventory
             </Typography>
 
-            <FormControl fullWidth margin="dense">
-                <InputLabel>Office</InputLabel>
-                <Select
-                    value={selectedOffice}
-                    onChange={(e) => setSelectedOffice(e.target.value)}
-                >
-                    {offices.map((office) => (
-                        <MenuItem key={office.id} value={office.id}>
-                            {office.name}
-                        </MenuItem>
-                    ))}
-                </Select>
-            </FormControl>
-            <Box sx={{ marginTop: 2, display: "flex", gap: 2, flexWrap: "wrap" }}>
+            {/* Flex Container */}
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    flexWrap: "wrap",
+                }}
+            >
+                <FormControl size="small" sx={{ minWidth: 120 }}>
+                    <InputLabel>Office</InputLabel>
+                    <Select
+                        value={selectedOffice}
+                        onChange={(e) => setSelectedOffice(e.target.value)}
+                    >
+                        {offices.map((office) => (
+                            <MenuItem key={office.id} value={office.id}>
+                                {office.name}
+                            </MenuItem>
+                        ))}
+                    </Select>
+                </FormControl>
                 <Button
+                    size="small"
                     variant="contained"
                     color="primary"
                     startIcon={<FileDownload />}
                     onClick={handleTemplateDownload}
                     disabled={isLoading}
-                    sx={{
-                        textTransform: "uppercase",
-                        fontWeight: "bold",
-                        borderRadius: "8px",
-                        height: "40px",
-                    }}
+                    // sx={{
+                    //     textTransform: "uppercase",
+                    //     fontWeight: "bold",
+                    //     borderRadius: "8px",
+                    //     height: "40px",
+                    // }}
                 >
                     Template
                 </Button>
                 <Button
+                    size="small"
                     variant="contained"
                     color="secondary"
                     startIcon={<CloudUpload />}
                     component="label"
                     disabled={isLoading}
-                    sx={{
-                        textTransform: "uppercase",
-                        fontWeight: "bold",
-                        borderRadius: "8px",
-                        height: "40px",
-                    }}
+                    // sx={{
+                    //     textTransform: "uppercase",
+                    //     fontWeight: "bold",
+                    //     borderRadius: "8px",
+                    //     height: "40px",
+                    // }}
                 >
                     Import
-                    <input
-                        type="file"
-                        hidden
-                        onChange={handleFileChange}
-                    />
+                    <input type="file" hidden onChange={handleFileChange} />
                 </Button>
                 <Button
+                    size="small"
                     variant="contained"
                     color="success"
                     startIcon={<UploadFile />}
                     onClick={handleImport}
                     disabled={!selectedFile || isLoading}
-                    sx={{
-                        textTransform: "uppercase",
-                        fontWeight: "bold",
-                        borderRadius: "8px",
-                        height: "40px",
-                    }}
+                    // sx={{
+                    //     textTransform: "uppercase",
+                    //     fontWeight: "bold",
+                    //     borderRadius: "8px",
+                    //     height: "40px",
+                    // }}
                 >
                     {isLoading ? <CircularProgress size={20} color="inherit" /> : "Upload"}
                 </Button>
                 <Button
+                    size="small"
                     variant="contained"
                     color="info"
                     startIcon={<FileUpload />}
                     onClick={handleExport}
                     disabled={isLoading}
-                    sx={{
-                        textTransform: "uppercase",
-                        fontWeight: "bold",
-                        borderRadius: "8px",
-                        height: "40px",
-                    }}
+                    // sx={{
+                    //     textTransform: "uppercase",
+                    //     fontWeight: "bold",
+                    //     borderRadius: "8px",
+                    //     height: "40px",
+                    // }}
                 >
                     Export
                 </Button>
             </Box>
-            <Box sx={{ marginTop: 4, display: "flex", alignItems: "center", gap: 2 }}>
-                <TextField
-                    label="Year for Broadsheet"
-                    type="number"
-                    value={year}
-                    onChange={(e) => setYear(e.target.value)}
-                    margin="dense"
-                    sx={{ flex: 1 }}
-                />
-                <Button
-                    variant="contained"
-                    color="error"
-                    startIcon={<TableChart />}
-                    onClick={handleBroadsheet}
-                    disabled={isLoading}
-                    sx={{
-                        textTransform: "uppercase",
-                        fontWeight: "bold",
-                        borderRadius: "8px",
-                        height: "40px",
-                    }}
-                >
-                    Broadsheet
-                </Button>
-                {isLoading && <CircularProgress />}
-            </Box>
+            {/* Broadsheet Button (Only for Super Admin) */}
+            {role === "super_admin" && (
+                <Box sx={{ marginTop: 4, display: "flex", alignItems: "center", gap: 2 }}>
+                    <TextField
+                        size="small"
+                        label="Year for Broadsheet"
+                        type="number"
+                        value={year}
+                        onChange={(e) => setYear(e.target.value)}
+                        margin="dense"
+                        sx={{ flex: 1 }}
+                    />
+                    <Button
+                        size="small"
+                        variant="contained"
+                        color="error"
+                        startIcon={<TableChart />}
+                        onClick={handleBroadsheet}
+                        disabled={isLoading}
+                        sx={{
+                            textTransform: "uppercase",
+                            fontWeight: "bold",
+                            borderRadius: "8px",
+                            height: "40px",
+                        }}
+                    >
+                        Broadsheet
+                    </Button>
+                    {isLoading && <CircularProgress />}
+                </Box>
+            )}
         </Box>
     );
 };

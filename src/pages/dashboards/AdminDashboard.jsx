@@ -1,67 +1,97 @@
-import { useState, useEffect } from "react";
-import { jwtDecode } from "jwt-decode"; // Fixed import
+import React, { useState, useEffect } from "react";
+import { jwtDecode } from "jwt-decode"; // Correct import
 import { Box, Container } from "@mui/material";
+import Typography from '@mui/material/Typography';
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../../pages/dashboards/Sidebar"; // Adjust the import path if necessary
-import DashboardHeader from "./DashboardHeader"; // Header Component
+import Sidebar from "../../pages/dashboards/Sidebar"; // Adjust the import path
+import DashboardHeader from "./DashboardHeader";
 import UserManagement from "../../components/usermanagement/UserManagement";
 import OfficeManagement from "../../components/officemanagement/OfficeManagement";
 import ItemRegister from "../../components/itemregister/ItemRegister";
 import InventoryDashboard from "../../components/inventory/InventoryDashboard";
 import Dashboard from "../../components/report/StatsCard";
+import ProfileSection from "./ProfileSection";
+
+
+const ROLE_CONSTANTS = {
+    SUPER_ADMIN: "super_admin",
+    ADMIN: "admin",
+    STAFF: "staff",
+};
 
 const AdminDashboard = () => {
-    const [currentSection, setCurrentSection] = useState("reports");
+    const [currentSection, setCurrentSection] = useState("profile");
     const [role, setRole] = useState("");
     const [welcomeMessage, setWelcomeMessage] = useState("");
     const navigate = useNavigate();
 
+    // Decode token and set user role
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (!token) {
-            navigate("/login"); // Redirect to login if no token
+            navigate("/login"); // Redirect if no token
             return;
         }
 
         try {
             const decodedToken = jwtDecode(token);
-            const role = decodedToken.role;
+            const userRole = decodedToken.role;
 
-            // Check for valid roles
-            if (!["admin", "super_admin"].includes(role)) {
+            // Validate role
+            if (![ROLE_CONSTANTS.SUPER_ADMIN, ROLE_CONSTANTS.ADMIN, ROLE_CONSTANTS.STAFF].includes(userRole)) {
                 navigate("/unauthorized");
+                return;
             }
 
-            // Optional: Save role for conditional rendering
-            setRole(role);
+            setRole(userRole); // Set role for conditional rendering
         } catch (error) {
             console.error("Error decoding token:", error);
-            navigate("/login");
+            navigate("/login"); // Redirect on error
         }
     }, [navigate]);
 
-    // Generate welcome message with date and time
+    // Generate and update welcome message
     useEffect(() => {
         const updateDateTime = () => {
             const now = new Date();
             const options = { year: "numeric", month: "long", day: "numeric" };
-            const date = now.toLocaleDateString(undefined, options); // e.g., January 21, 2025
-            const time = now.toLocaleTimeString(); // e.g., 2:45:30 PM
+            const date = now.toLocaleDateString(undefined, options);
+            const time = now.toLocaleTimeString();
 
-            setWelcomeMessage(`Hello & Welcome. Today is ${date}, ${time}.`);
+            // setWelcomeMessage(`Hello & Welcome. Today is ${date}, ${time}.`);
         };
 
         updateDateTime();
-
-        // Optionally, update the time every minute or second
         const timer = setInterval(updateDateTime, 1000);
 
-        // Cleanup interval on component unmount
-        return () => clearInterval(timer);
+        return () => clearInterval(timer); // Cleanup
     }, []);
 
     const handleSectionChange = (section) => {
         setCurrentSection(section);
+    };
+
+    // Conditional rendering helper
+    const renderSection = () => {
+        if (currentSection === "profile" && [ROLE_CONSTANTS.SUPER_ADMIN, ROLE_CONSTANTS.STAFF].includes(role)) {
+            return <ProfileSection />;
+        }
+        if (currentSection === "userManagement" && role === ROLE_CONSTANTS.SUPER_ADMIN) {
+            return <UserManagement />;
+        }
+        if (currentSection === "officeManagement" && role === ROLE_CONSTANTS.SUPER_ADMIN) {
+            return <OfficeManagement />;
+        }
+        if (currentSection === "itemRegister" && role === ROLE_CONSTANTS.SUPER_ADMIN) {
+            return <ItemRegister />;
+        }
+        if (currentSection === "inventory" && [ROLE_CONSTANTS.SUPER_ADMIN, ROLE_CONSTANTS.STAFF].includes(role)) {
+            return <InventoryDashboard role={role} />; // Pass role prop
+        }                
+        if (currentSection === "reports" && [ROLE_CONSTANTS.SUPER_ADMIN, ROLE_CONSTANTS.STAFF].includes(role)) {
+            return <Dashboard />;
+        }
+        return <Typography variant="h6">Section not found.</Typography>;
     };
 
     return (
@@ -71,28 +101,14 @@ const AdminDashboard = () => {
 
             {/* Main Content */}
             <Box sx={{ flexGrow: 1 }}>
-                {/* Admin Header */}
+                {/* Dashboard Header */}
                 <DashboardHeader
                     dashboardName="Admin Dashboard"
-                    welcomeMessage={welcomeMessage} // Dynamic welcome message
+                    welcomeMessage={welcomeMessage}
                 />
+
                 <Container sx={{ paddingTop: 3 }}>
-                    {/* Section Rendering */}
-                    {currentSection === "userManagement" && role === "super_admin" && (
-                        <UserManagement />
-                    )}
-                    {currentSection === "officeManagement" && role === "super_admin" && (
-                        <OfficeManagement />
-                    )}
-                    {currentSection === "itemRegister" && role === "super_admin" && (
-                        <ItemRegister />
-                    )}
-                    {currentSection === "inventory" && role === "super_admin" && (
-                        <InventoryDashboard />
-                    )}
-                    {currentSection === "reports" && role === "super_admin" && (
-                        <Dashboard />
-                    )}
+                    {renderSection()} {/* Render the current section */}
                 </Container>
             </Box>
         </Box>

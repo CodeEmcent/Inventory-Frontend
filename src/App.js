@@ -32,8 +32,9 @@ const App = () => {
     const protectedPaths = [
         "/admin-dashboard",
         "/staff-dashboard",
+        "/profile",
         "/register",
-        "/api/offices",
+        "/offices",
         "/inventory",
         "/reports",
     ];
