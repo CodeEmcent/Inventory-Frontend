@@ -55,19 +55,20 @@ const App = () => {
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Login />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
 
                 {/* Protected Routes */}
-                <Route
+                {/* <Route
                     path="/register"
                     element={
                         <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
                             <Register />
                         </ProtectedRoute>
                     }
-                />
+                /> */}
                 <Route
                     path="/admin-dashboard"
                     element={
