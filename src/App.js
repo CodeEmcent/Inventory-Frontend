@@ -33,7 +33,6 @@ const App = () => {
         "/admin-dashboard",
         "/staff-dashboard",
         "/profile",
-        "/register",
         "/offices",
         "/inventory",
         "/reports",
@@ -55,7 +54,7 @@ const App = () => {
                 {/* Public Routes */}
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Login />} />
+                <Route path="/register" element={<Register />} />
                 <Route path="/services" element={<Services />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
