@@ -29,7 +29,8 @@ const Register = () => {
         try {
             // Make the API request
             const response = await axios.post(
-                "http://127.0.0.1:8000/api/users/register/",
+                // "http://127.0.0.1:8000/api/users/register/",
+                "https://centory-frontend-p5p6ji85t-emekwue-innocents-projects.vercel.app/register/",
                 {
                     username,
                     first_name: firstName, // Add first_name
