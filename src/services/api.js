@@ -1,10 +1,11 @@
 import axios from 'axios';
 
-// const API = axios.create({
-//     baseURL: process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/', // Dynamic base URL
-// });
+// Create the Axios instance with dynamic baseURL
 const API = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || (process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8000/' : 'https://inventory-aar6.onrender.com'),
+    baseURL: process.env.REACT_APP_API_BASE_URL ||
+        (process.env.NODE_ENV === 'development'
+            ? 'http://127.0.0.1:8000/'
+            : 'https://inventory-aar6.onrender.com/'), // Deployed backend URL
 });
 
 // Add JWT token to headers
@@ -38,9 +39,9 @@ API.interceptors.response.use(
                     throw new Error('No refresh token found');
                 }
 
-                // Request a new access token using the refresh token
+                // Use baseURL to construct the refresh token URL
                 const response = await axios.post(
-                    'http://127.0.0.1:8000/token/refresh/', 
+                    `${API.defaults.baseURL}token/refresh/`, // Use baseURL dynamically
                     { refresh: refreshToken }
                 );
 
