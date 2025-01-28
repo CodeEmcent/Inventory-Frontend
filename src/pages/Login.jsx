@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { decode as jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import axiosInstance from "../utils/axiosInstance"; // Use centralized axiosInstance
 import {
     Box,
