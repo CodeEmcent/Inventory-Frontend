@@ -5,7 +5,7 @@ const API = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL ||
         (process.env.NODE_ENV === 'development'
             ? 'http://127.0.0.1:8000/'
-            : 'https://inventory-aar6.onrender.com/'), // Deployed backend URL
+            : 'https://emcentvault.onrender.com'), // Deployed backend URL
 });
 
 // Add JWT token to headers

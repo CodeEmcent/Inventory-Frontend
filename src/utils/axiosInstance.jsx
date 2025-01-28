@@ -4,7 +4,7 @@ const axiosInstance = axios.create({
     baseURL: process.env.REACT_APP_API_BASE_URL ||
         (process.env.NODE_ENV === "development"
             ? "http://127.0.0.1:8000" // Local backend during development
-            : "https://inventory-aar6.onrender.com"), // Deployed backend
+            : "https://emcentvault.onrender.com"), // Deployed backend 
     headers: {
         "Content-Type": "application/json",
     },
