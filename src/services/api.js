@@ -1,7 +1,10 @@
 import axios from 'axios';
 
+// const API = axios.create({
+//     baseURL: process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/', // Dynamic base URL
+// });
 const API = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/', // Dynamic base URL
+    baseURL: process.env.REACT_APP_API_BASE_URL || (process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:8000/' : 'https://inventory-aar6.onrender.com'),
 });
 
 // Add JWT token to headers
